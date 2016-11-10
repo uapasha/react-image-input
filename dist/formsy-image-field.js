@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'formsy-react', './picture-field'], factory);
+    define(['exports', 'react', 'formsy-react', './image-field'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('formsy-react'), require('./picture-field'));
+    factory(exports, require('react'), require('formsy-react'), require('./image-field'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.formsyReact, global.pictureField);
-    global.formsyPictureField = mod.exports;
+    factory(mod.exports, global.react, global.formsyReact, global.imageField);
+    global.formsyImageField = mod.exports;
   }
-})(this, function (exports, _react, _formsyReact, _pictureField) {
+})(this, function (exports, _react, _formsyReact, _imageField) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -19,7 +19,7 @@
 
   var _react2 = _interopRequireDefault(_react);
 
-  var _pictureField2 = _interopRequireDefault(_pictureField);
+  var _imageField2 = _interopRequireDefault(_imageField);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -53,16 +53,16 @@
     return target;
   }
 
-  var FormsyPictureField = function FormsyPictureField(_ref) {
+  var FormsyImageField = function FormsyImageField(_ref) {
     var setValue = _ref.setValue,
         props = _objectWithoutProperties(_ref, ['setValue']);
 
-    return _react2.default.createElement(_pictureField2.default, _extends({ onFileSelect: setValue }, props));
+    return _react2.default.createElement(_imageField2.default, _extends({ onFileSelect: setValue }, props));
   };
 
-  FormsyPictureField.propTypes = {
+  FormsyImageField.propTypes = {
     setValue: _react.PropTypes.func
   };
 
-  exports.default = (0, _formsyReact.HOC)(FormsyPictureField);
+  exports.default = (0, _formsyReact.HOC)(FormsyImageField);
 });

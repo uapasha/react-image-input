@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'material-ui/Avatar', 'material-ui', 'material-ui/svg-icons/image/image', 'material-ui/svg-icons/action/delete', 'material-ui/svg-icons/file/file-upload', '/lib/images', 'meteor/universe:i18n'], factory);
+    define(['exports', 'react', 'material-ui/Avatar', 'material-ui', 'material-ui/svg-icons/image/image', 'material-ui/svg-icons/action/delete', 'material-ui/svg-icons/file/file-upload', './utils/images', './utils/messages'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('material-ui/Avatar'), require('material-ui'), require('material-ui/svg-icons/image/image'), require('material-ui/svg-icons/action/delete'), require('material-ui/svg-icons/file/file-upload'), require('/lib/images'), require('meteor/universe:i18n'));
+    factory(exports, require('react'), require('material-ui/Avatar'), require('material-ui'), require('material-ui/svg-icons/image/image'), require('material-ui/svg-icons/action/delete'), require('material-ui/svg-icons/file/file-upload'), require('./utils/images'), require('./utils/messages'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.Avatar, global.materialUi, global.image, global._delete, global.fileUpload, global.images, global.universeI18n);
+    factory(mod.exports, global.react, global.Avatar, global.materialUi, global.image, global._delete, global.fileUpload, global.images, global.messages);
     global.imagePreview = mod.exports;
   }
-})(this, function (exports, _react, _Avatar, _materialUi, _image, _delete, _fileUpload, _images, _universeI18n) {
+})(this, function (exports, _react, _Avatar, _materialUi, _image, _delete, _fileUpload, _images, _messages) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -29,7 +29,7 @@
 
   var _images2 = _interopRequireDefault(_images);
 
-  var _universeI18n2 = _interopRequireDefault(_universeI18n);
+  var _messages2 = _interopRequireDefault(_messages);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -97,20 +97,31 @@
     fullWidthPicture: {
       width: '100%'
     },
-    uploadIcon: {
-      width: 60,
-      height: 60,
-      position: 'absolute',
-      top: 'calc(50% - 30px)',
-      right: 'calc(50% - 30px)'
+    onHover: {
+      root: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(255,255,255,0.7)',
+        top: 0,
+        left: 0,
+        zIndex: 2
+      },
+      uploadIcon: {
+        width: 60,
+        height: 60,
+        position: 'absolute',
+        top: 'calc(50% - 30px)',
+        right: 'calc(50% - 30px)'
+      },
+      deleteIcon: {
+        position: 'absolute',
+        top: 0,
+        right: 0
+      }
     },
     input: {
       display: 'none'
-    },
-    deleteIcon: {
-      position: 'absolute',
-      top: 0,
-      right: 0
     }
   };
 
@@ -150,7 +161,7 @@
 
         var imageType = _images2.default.getImageType(imageUrl);
         if (!~_this.allowedFileTypes.indexOf(imageType)) {
-          onError('' + _universeI18n2.default.__('wrong_file_type') + _this.allowedFileTypes.join(', '));
+          onError('' + _messages2.default['wrong_file_type'] + _this.allowedFileTypes.join(', '));
           return {};
         }
         return { imageType: imageType };
@@ -233,16 +244,16 @@
           }),
           this.state.isHovered ? _react2.default.createElement(
             'div',
-            { className: 'image-upload' },
-            _react2.default.createElement(_fileUpload2.default, { style: styles.uploadIcon }),
+            { style: styles.onHover.root },
+            _react2.default.createElement(_fileUpload2.default, { style: styles.onHover.uploadIcon }),
             this.props.imageUrl ? _react2.default.createElement(
               _materialUi.IconButton,
               {
-                style: styles.deleteIcon,
+                style: styles.onHover.deleteIcon,
                 onTouchTap: function onTouchTap() {
                   return _this2.props.clearImageData(true);
                 },
-                tooltip: _universeI18n2.default.__('delete_image')
+                tooltip: _messages2.default['delete_image']
               },
               _react2.default.createElement(_delete2.default, null)
             ) : ''

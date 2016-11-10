@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'material-ui/Dialog', 'material-ui/FlatButton', 'react-cropper', './messages', '/node_modules/cropperjs/dist/cropper.css'], factory);
+    define(['exports', 'react', 'material-ui/Dialog', 'material-ui/FlatButton', 'react-cropper', './utils/messages', '/node_modules/cropperjs/dist/cropper.css'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('material-ui/Dialog'), require('material-ui/FlatButton'), require('react-cropper'), require('./messages'), require('/node_modules/cropperjs/dist/cropper.css'));
+    factory(exports, require('react'), require('material-ui/Dialog'), require('material-ui/FlatButton'), require('react-cropper'), require('./utils/messages'), require('/node_modules/cropperjs/dist/cropper.css'));
   } else {
     var mod = {
       exports: {}

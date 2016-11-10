@@ -1,14 +1,14 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'material-ui/CircularProgress', '/lib/images', './cropper-dialog', './image-preview'], factory);
+    define(['exports', 'react', 'material-ui/CircularProgress', './utils/images', './cropper-dialog', './image-preview'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('material-ui/CircularProgress'), require('/lib/images'), require('./cropper-dialog'), require('./image-preview'));
+    factory(exports, require('react'), require('material-ui/CircularProgress'), require('./utils/images'), require('./cropper-dialog'), require('./image-preview'));
   } else {
     var mod = {
       exports: {}
     };
     factory(mod.exports, global.react, global.CircularProgress, global.images, global.cropperDialog, global.imagePreview);
-    global.pictureField = mod.exports;
+    global.imageField = mod.exports;
   }
 })(this, function (exports, _react, _CircularProgress, _images, _cropperDialog, _imagePreview) {
   'use strict';
@@ -111,16 +111,31 @@
     root: {
       textAlign: 'center',
       position: 'relative'
+    },
+    uploading: {
+      root: {
+        position: 'fixed',
+        height: '100%',
+        width: 'calc(100% - 12px)',
+        backgroundColor: 'rgba(255,255,255,0.6)',
+        top: '0',
+        left: '0',
+        margin: '0 6px',
+        zIndex: '2000'
+      },
+      progress: {
+        top: 'calc(50% - 50px)'
+      }
     }
   };
 
-  var PictureField = function (_Component) {
-    _inherits(PictureField, _Component);
+  var ImageField = function (_Component) {
+    _inherits(ImageField, _Component);
 
-    function PictureField(props) {
-      _classCallCheck(this, PictureField);
+    function ImageField(props) {
+      _classCallCheck(this, ImageField);
 
-      var _this = _possibleConstructorReturn(this, (PictureField.__proto__ || Object.getPrototypeOf(PictureField)).call(this, props));
+      var _this = _possibleConstructorReturn(this, (ImageField.__proto__ || Object.getPrototypeOf(ImageField)).call(this, props));
 
       _this.onCrop = function (canvas) {
         // toBlob polyfill
@@ -277,7 +292,7 @@
       return _this;
     }
 
-    _createClass(PictureField, [{
+    _createClass(ImageField, [{
       key: 'render',
       value: function render() {
         var _this2 = this;
@@ -299,8 +314,8 @@
             { style: styles.root },
             isUploading ? _react2.default.createElement(
               'div',
-              { className: 'image-upload-uploading' },
-              _react2.default.createElement(_CircularProgress2.default, null)
+              { style: styles.uploading.root },
+              _react2.default.createElement(_CircularProgress2.default, { style: styles.uploading.progress })
             ) : '',
             _react2.default.createElement(_imagePreview2.default, _extends({
               imageUrl: imagePreviewUrl || savedImage,
@@ -323,10 +338,10 @@
       }
     }]);
 
-    return PictureField;
+    return ImageField;
   }(_react.Component);
 
-  PictureField.propTypes = {
+  ImageField.propTypes = {
     /**
      *  @param {string} [savedImage] - url to image that is already saved
      */
@@ -370,5 +385,5 @@
      */
     options: _react.PropTypes.object
   };
-  exports.default = PictureField;
+  exports.default = ImageField;
 });
