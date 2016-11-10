@@ -1,10 +1,10 @@
-import PictureField from './picture-field';
-import FormsyPictureField from './formsy-picture-field';
+import ImageField from './image-field';
+import FormsyImageField from './formsy-image-field';
 import ImagePreview from './image-preview';
 
 export {
-  FormsyPictureField,
+  FormsyImageField,
   ImagePreview,
 };
 
-export default PictureField;
+export default ImageField;

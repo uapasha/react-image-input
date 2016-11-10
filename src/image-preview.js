@@ -4,8 +4,8 @@ import { IconButton } from 'material-ui';
 import ImageIcon from 'material-ui/svg-icons/image/image';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import FileUpload from 'material-ui/svg-icons/file/file-upload';
-import images from '/lib/images';
-import i18n from 'meteor/universe:i18n';
+import images from './utils/images';
+import messages from './utils/messages';
 
 const styles = {
   root: {
@@ -19,20 +19,31 @@ const styles = {
   fullWidthPicture: {
     width: '100%',
   },
-  uploadIcon: {
-    width: 60,
-    height: 60,
-    position: 'absolute',
-    top: 'calc(50% - 30px)',
-    right: 'calc(50% - 30px)',
+  onHover: {
+    root: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(255,255,255,0.7)',
+      top: 0,
+      left: 0,
+      zIndex: 2,
+    },
+    uploadIcon: {
+      width: 60,
+      height: 60,
+      position: 'absolute',
+      top: 'calc(50% - 30px)',
+      right: 'calc(50% - 30px)',
+    },
+    deleteIcon: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+    },
   },
   input: {
     display: 'none',
-  },
-  deleteIcon: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
   },
 };
 
@@ -89,7 +100,7 @@ class ImagePreview extends Component {
     const imageType = images.getImageType(imageUrl);
     if (!~this.allowedFileTypes.indexOf(imageType)) {
       onError(
-        `${i18n.__('wrong_file_type')}${this.allowedFileTypes.join(', ')}`
+        `${messages['wrong_file_type']}${this.allowedFileTypes.join(', ')}`
       );
       return {};
     }
@@ -150,13 +161,13 @@ class ImagePreview extends Component {
           onChange={this.onFileChange}
         />
         {this.state.isHovered
-          ? <div className="image-upload">
-            <FileUpload style={styles.uploadIcon} />
+          ? <div style={styles.onHover.root}>
+            <FileUpload style={styles.onHover.uploadIcon} />
             {this.props.imageUrl ?
               <IconButton
-                style={styles.deleteIcon}
+                style={styles.onHover.deleteIcon}
                 onTouchTap={() => this.props.clearImageData(true)}
-                tooltip={i18n.__('delete_image')}
+                tooltip={messages['delete_image']}
               >
                 <DeleteIcon />
               </IconButton>

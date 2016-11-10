@@ -3,7 +3,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Cropper from 'react-cropper';
 import '/node_modules/cropperjs/dist/cropper.css';
-import messages from './messages';
+import messages from './utils/messages';
 
 
 // TODO uapasha handle style

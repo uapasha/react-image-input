@@ -1,8 +1,8 @@
 {
     "name": "react-image-input",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "get your image input field easy and ready to go",
-    "main": "./src/index.js",
+    "main": "./dist/index.js",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/uapasha/react-image-input.git"

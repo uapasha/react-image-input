@@ -5,7 +5,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import CircularProgress from 'material-ui/CircularProgress';
-import images from '/lib/images';
+import images from './utils/images';
 import CropperDialog from './cropper-dialog';
 import ImagePreview from './image-preview';
 
@@ -14,9 +14,24 @@ const styles = {
     textAlign: 'center',
     position: 'relative',
   },
+  uploading: {
+    root: {
+      position: 'fixed',
+      height: '100%',
+      width: 'calc(100% - 12px)',
+      backgroundColor: 'rgba(255,255,255,0.6)',
+      top: '0',
+      left: '0',
+      margin: '0 6px',
+      zIndex: '2000',
+    },
+    progress: {
+      top: 'calc(50% - 50px)',
+    },
+  },
 };
 
-class PictureField extends Component {
+class ImageField extends Component {
   static propTypes = {
     /**
      *  @param {string} [savedImage] - url to image that is already saved
@@ -215,8 +230,8 @@ class PictureField extends Component {
       <div>
         <div style={styles.root}>
           {isUploading
-            ? <div className="image-upload-uploading">
-              <CircularProgress />
+            ? <div style={styles.uploading.root}>
+              <CircularProgress style={styles.uploading.progress} />
             </div>
             : ''}
           <ImagePreview
@@ -240,4 +255,4 @@ class PictureField extends Component {
   }
 }
 
-export default PictureField; // eslint-disable-line new-cap
+export default ImageField; // eslint-disable-line new-cap
