@@ -35,4 +35,13 @@ export default {
   getImageType(dataUrl) {
     return dataUrl.slice(0, dataUrl.indexOf(';')).slice(dataUrl.indexOf(':') + 1);
   },
+  convertToBlob(dataUrl, type) {
+    const binStr = atob(dataUrl.split(',')[1]);
+    const len = binStr.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      arr[i] = binStr.charCodeAt(i);
+    }
+    return new Blob([arr], { type: type || 'image/png' });
+  },
 };

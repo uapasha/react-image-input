@@ -71,3 +71,7 @@ is supported only if no crop applied
 ## License
 
 MIT
+
+##
+Made with the help of [juliancwirko/react-npm-boilerplate](https://github.com/juliancwirko/react-npm-boilerplate)
+package
