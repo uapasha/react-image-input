@@ -1,6 +1,6 @@
 {
   "name": "react-image-input",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "get your image input field easy and ready to go",
   "main": "./dist/index.js",
   "repository": {

@@ -1,5 +1,5 @@
 export default {
-  resizeImage(dataUrl, imageType, maxWidth, maxHeight) {
+  resizeImage(dataUrl, imageType, maxWidth = 0, maxHeight = 0) {
     return new Promise((resolve, reject) => {
       const img = document.createElement('img');
       img.src = dataUrl;
@@ -12,17 +12,16 @@ export default {
         let width = img.width;
         let height = img.height;
 
-        if (width > height) {
-          if (width > maxWidth) {
-            height *= maxWidth / width;
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width *= maxHeight / height;
-            height = maxHeight;
-          }
+        if (maxWidth && width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
         }
+
+        if (maxHeight && height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+
         canvas.width = width;
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);

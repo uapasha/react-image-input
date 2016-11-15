@@ -95,6 +95,19 @@ ImageField.propTypes = {
    * @param {bool} [options.immediateUpload = false] - upload image immediately
    * @param {bool} [multipleUpload = false] - able to select and upload multiple images at once
    * is supported only if no crop applied
+   * @ param {object} [sizes] - sizes for saving images in multiple sizes for example:
+   * {
+   *   small: {
+   *     maxWidth: 400,
+   *     maxHeight: 300,
+   *   },
+   *   medium: {
+   *     maxWidth: 700,
+   *   },
+   *   large: {
+   *    maxWidth: 1024,
+   *    },
+   * }
    */
   options: PropTypes.object,
 };

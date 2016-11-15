@@ -2,7 +2,6 @@ import React, { PropTypes, Component } from 'react';
 import images from './utils/images';
 import ImagePreview from './image-preview';
 
-
 class MultipleImages extends Component {
   static propTypes = {
     /**
@@ -22,9 +21,21 @@ class MultipleImages extends Component {
      * @param {bool} [options.resize = true] - resize image before upload
      * @param {number} [options.maxHeight = 300] - max value for height of resized image in px
      * @param {number} [options.maxWidth = 400] - max value for width of resized image in px
-     * @param {bool} [options.immediateUpload = false] - upload image immediately
      * @param {bool} [multipleUpload = false] - able to select and upload multiple images at once
      * is supported only if no crop applied
+     * @ param {object} [sizes] - sizes for saving images in multiple sizes for example:
+       * {
+       *   small: {
+       *     maxWidth: 400,
+       *     maxHeight: 300,
+       *   },
+       *   medium: {
+       *     maxWidth: 700,
+       *   },
+       *   large: {
+       *    maxWidth: 1024,
+       *    },
+       * }
      */
     options: PropTypes.object,
   };
@@ -33,35 +44,45 @@ class MultipleImages extends Component {
     super(props);
     if (props.options) {
       this.resize = props.options.resize !== false;
-      this.immediateUpload = props.options.immediateUpload;
       this.maxWidth = props.options.maxWidth || 400;
       this.maxHeight = props.options.maxHeight || 300;
+      this.sizes = props.options.sizes;
     } else {
       this.maxWidth = this.defaultMaxImageWidth;
       this.maxHeight = this.defaultMaxImageHeight;
     }
   }
 
-  handleNewUrl = (previewData) => {
+  handleNewUrls = (previewData) => {
     const { promisifiedImagesUrls } = previewData;
     if (promisifiedImagesUrls) {
-      this.handleMultipleImages(promisifiedImagesUrls);
+      if (!this.sizes) {
+        this.handleImages(promisifiedImagesUrls);
+      } else {
+        this.handleResizes(promisifiedImagesUrls);
+      }
     } else {
       throw new Error(
-        'Image preview should supply promisifiedImagesUrls if dealing with multiple upload'
+        'Image preview should supply { promisifiedImagesUrls } if dealing with multiple upload'
       );
     }
   };
 
-  handleMultipleImages = (promisifiedImagesUrls) => {
+  handleResizes = (promisifiedImagesUrls) => {
+    const sizes = this.sizes;
+    const imagesAmount = promisifiedImagesUrls.length;
     Promise.all(promisifiedImagesUrls)
-      .then((imagesData) => (
-        imagesData.map(
-          ({ imageData, imageType }) => (
-            images.resizeImage(imageData, imageType, this.maxWidth, this.maxHeight)
-          )
-        )
-      ))
+      .then((imagesData) => {
+        const res = [];
+        Object.keys(sizes).forEach(size => (
+          res.push(...imagesData.map(
+            ({ imageData, imageType }) => (
+              images.resizeImage(imageData, imageType, sizes[size].maxWidth, sizes[size].maxHeight)
+            )
+          )))
+        );
+        return res;
+      })
       .then((resizePromises) => Promise.all(resizePromises))
       .then((resizedImages) => (
           resizedImages.map(({ resizedImageData, imageType }) => (
@@ -69,11 +90,54 @@ class MultipleImages extends Component {
           ))
         )
       )
-      .then((imagesFiles) => this.handleMultipleImagesUpload(imagesFiles))
-      .catch((e) => this.onError(e));
+      .then((imagesFiles) => {
+        const res = [];
+        const sizesAmount = Object.keys(sizes).length;
+        const filesAmount = imagesFiles.length;
+        imagesFiles.forEach((blob, i) => {
+          const size = Object.keys(sizes)[Math.floor(i / filesAmount * sizesAmount)];
+          const imageNum = i % imagesAmount;
+          if (res[imageNum]) {
+            res[imageNum].push({ size, blob });
+          } else res[imageNum] = [{ size, blob }];
+        });
+        this.handleImagesUpload(res);
+      })
+      .catch(e => console.error(e));
   };
 
-  handleMultipleImagesUpload = (imagesFiles) => {
+  handleImages = (promisifiedImagesUrls) => {
+    if (this.resize) {
+      Promise.all(promisifiedImagesUrls)
+        .then((imagesData) => (
+          imagesData.map(
+            ({ imageData, imageType }) => (
+              images.resizeImage(imageData, imageType, this.maxWidth, this.maxHeight)
+            )
+          )
+        ))
+        .then((resizePromises) => Promise.all(resizePromises))
+        .then((resizedImages) => (
+            resizedImages.map(({ resizedImageData, imageType }) => (
+              images.convertToBlob(resizedImageData, imageType)
+            ))
+          )
+        )
+        .then((imagesFiles) => this.handleImagesUpload(imagesFiles))
+        .catch((e) => this.onError(e));
+    } else {
+      Promise.all(promisifiedImagesUrls)
+        .then((imagesData) => (
+          imagesData.map(
+            ({ imageData, imageType }) => images.convertToBlob(imageData, imageType)
+          )
+        ))
+        .then((imagesFiles) => this.handleImagesUpload(imagesFiles))
+        .catch((e) => this.onError(e));
+    }
+  };
+
+  handleImagesUpload = (imagesFiles) => {
     this.props.onFileSelect(imagesFiles);
   };
 
@@ -85,7 +149,7 @@ class MultipleImages extends Component {
     const { options, ...props } = this.props;
     return (
       <ImagePreview
-        setImageUrl={this.handleNewUrl}
+        setImageUrl={this.handleNewUrls}
         clearImageData={this.clearImageData}
         options={options}
         {...props}

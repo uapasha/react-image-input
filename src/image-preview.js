@@ -81,6 +81,8 @@ class ImagePreview extends Component {
     const { files } = e.target;
     if (!files.length) {
       this.props.clearImageData();
+    } else if (this.multipleUpload) {
+      this.handleMultipleFiles(files);
     } else if (files.length === 1) {
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
@@ -89,8 +91,6 @@ class ImagePreview extends Component {
         if (!imageType) return;
         this.props.setImageUrl({ imageData: reader.result, imageType });
       };
-    } else {
-      this.handleMultipleFiles(files);
     }
     this.refs.imageInput.value = null;
   };
