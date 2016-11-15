@@ -138,6 +138,8 @@
 
         if (!files.length) {
           _this.props.clearImageData();
+        } else if (_this.multipleUpload) {
+          _this.handleMultipleFiles(files);
         } else if (files.length === 1) {
           (function () {
             var reader = new FileReader();
@@ -150,8 +152,6 @@
               _this.props.setImageUrl({ imageData: reader.result, imageType: imageType });
             };
           })();
-        } else {
-          _this.handleMultipleFiles(files);
         }
         _this.refs.imageInput.value = null;
       };

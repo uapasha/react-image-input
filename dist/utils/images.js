@@ -17,9 +17,10 @@
     value: true
   });
   exports.default = {
-    resizeImage: function resizeImage(dataUrl, imageType, maxWidth, maxHeight) {
-      // TODO uapasha refactor into promise
-      // TODO uapasha handle errors
+    resizeImage: function resizeImage(dataUrl, imageType) {
+      var maxWidth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      var maxHeight = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
       return new Promise(function (resolve, reject) {
         var img = document.createElement('img');
         img.src = dataUrl;
@@ -32,17 +33,16 @@
           var width = img.width;
           var height = img.height;
 
-          if (width > height) {
-            if (width > maxWidth) {
-              height *= maxWidth / width;
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width *= maxHeight / height;
-              height = maxHeight;
-            }
+          if (maxWidth && width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
           }
+
+          if (maxHeight && height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+
           canvas.width = width;
           canvas.height = height;
           ctx.drawImage(img, 0, 0, width, height);
@@ -53,6 +53,15 @@
     },
     getImageType: function getImageType(dataUrl) {
       return dataUrl.slice(0, dataUrl.indexOf(';')).slice(dataUrl.indexOf(':') + 1);
+    },
+    convertToBlob: function convertToBlob(dataUrl, type) {
+      var binStr = atob(dataUrl.split(',')[1]);
+      var len = binStr.length;
+      var arr = new Uint8Array(len);
+      for (var i = 0; i < len; i++) {
+        arr[i] = binStr.charCodeAt(i);
+      }
+      return new Blob([arr], { type: type || 'image/png' });
     }
   };
 });

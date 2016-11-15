@@ -1,6 +1,6 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define(['exports'], factory);
   } else if (typeof exports !== "undefined") {
     factory(exports);
   } else {
@@ -11,16 +11,16 @@
     global.messages = mod.exports;
   }
 })(this, function (exports) {
-  "use strict";
+  'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
   exports.default = {
-    "crop": "Crop",
-    "crop_image": "Crop image",
-    "wrong_file_type": "Wrong file type. Please, select one of the following formats: ",
-    "delete_image": "Delete image"
+    'crop': 'Crop',
+    'crop_image': 'Crop image',
+    'wrong_file_type': 'Wrong file type. Please, select one of the following formats: ',
+    'delete_image': 'Delete image'
 
   };
 });

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'material-ui/CircularProgress', './utils/images', './cropper-dialog', './image-preview'], factory);
+    define(['exports', 'react', 'material-ui/CircularProgress', './single-image', './multiple-images'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('material-ui/CircularProgress'), require('./utils/images'), require('./cropper-dialog'), require('./image-preview'));
+    factory(exports, require('react'), require('material-ui/CircularProgress'), require('./single-image'), require('./multiple-images'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.CircularProgress, global.images, global.cropperDialog, global.imagePreview);
+    factory(mod.exports, global.react, global.CircularProgress, global.singleImage, global.multipleImages);
     global.imageField = mod.exports;
   }
-})(this, function (exports, _react, _CircularProgress, _images, _cropperDialog, _imagePreview) {
+})(this, function (exports, _react, _CircularProgress, _singleImage, _multipleImages) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -21,31 +21,15 @@
 
   var _CircularProgress2 = _interopRequireDefault(_CircularProgress);
 
-  var _images2 = _interopRequireDefault(_images);
+  var _singleImage2 = _interopRequireDefault(_singleImage);
 
-  var _cropperDialog2 = _interopRequireDefault(_cropperDialog);
-
-  var _imagePreview2 = _interopRequireDefault(_imagePreview);
+  var _multipleImages2 = _interopRequireDefault(_multipleImages);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
       default: obj
     };
   }
-
-  var _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
 
   function _objectWithoutProperties(obj, keys) {
     var target = {};
@@ -57,54 +41,6 @@
     }
 
     return target;
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
   var styles = {
@@ -129,217 +65,27 @@
     }
   };
 
-  var ImageField = function (_Component) {
-    _inherits(ImageField, _Component);
+  var ImageField = function ImageField(props) {
+    var isUploading = props.isUploading,
+        other = _objectWithoutProperties(props, ['isUploading']);
 
-    function ImageField(props) {
-      _classCallCheck(this, ImageField);
-
-      var _this = _possibleConstructorReturn(this, (ImageField.__proto__ || Object.getPrototypeOf(ImageField)).call(this, props));
-
-      _this.onCrop = function (canvas) {
-        // toBlob polyfill
-        if (!HTMLCanvasElement.prototype.toBlob) {
-          Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-            value: function value(callback, type, quality) {
-              var binStr = atob(this.toDataURL(type, quality).split(',')[1]);
-              var len = binStr.length;
-              var arr = new Uint8Array(len);
-              for (var i = 0; i < len; i++) {
-                arr[i] = binStr.charCodeAt(i);
-              }
-              callback(new Blob([arr], { type: type || 'image/png' }));
-            }
-          });
-        }
-        canvas.toBlob(function (blob) {
-          var reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = function () {
-            _this.handleUpload({
-              imageData: reader.result,
-              imageType: _this.state.imageType,
-              blob: blob
-            });
-          };
-        }, '' + _this.state.imageType);
-      };
-
-      _this.convertToBlob = function (dataUrl, type) {
-        var binStr = atob(dataUrl.split(',')[1]);
-        var len = binStr.length;
-        var arr = new Uint8Array(len);
-        for (var i = 0; i < len; i++) {
-          arr[i] = binStr.charCodeAt(i);
-        }
-        return new Blob([arr], { type: type || 'image/png' });
-      };
-
-      _this.handleNewUrl = function (previewData) {
-        var promisifiedImagesUrls = previewData.promisifiedImagesUrls,
-            imageData = previewData.imageData,
-            imageType = previewData.imageType;
-
-        if (promisifiedImagesUrls) {
-          _this.handleMultipleImages(promisifiedImagesUrls);
-          return;
-        }
-        if (!_this.resize && !_this.crop) {
-          _this.handleUpload({
-            imageData: imageData,
-            imageType: imageType
-          });
-        } else if (_this.resize) {
-          _images2.default.resizeImage(imageData, imageType, _this.maxWidth, _this.maxHeight).then(function (_ref) {
-            var resizedImageData = _ref.resizedImageData;
-
-            if (_this.crop) {
-              _this.setState({
-                imagePreviewUrl: resizedImageData,
-                imageType: imageType,
-                isCropperOpen: true
-              });
-            } else {
-              _this.handleUpload({
-                imageData: resizedImageData,
-                imageType: imageType
-              });
-            }
-          }).catch(function (err) {
-            return _this.props.onError(err);
-          });
-        } else if (_this.crop) {
-          _this.setState({
-            imagePreviewUrl: imageData,
-            imageType: imageType,
-            isCropperOpen: true
-          });
-        }
-      };
-
-      _this.handleMultipleImages = function (promisifiedImagesUrls) {
-        Promise.all(promisifiedImagesUrls).then(function (imagesData) {
-          return imagesData.map(function (_ref2) {
-            var imageData = _ref2.imageData,
-                imageType = _ref2.imageType;
-            return _images2.default.resizeImage(imageData, imageType, _this.maxWidth, _this.maxHeight);
-          });
-        }).then(function (resizePromises) {
-          return Promise.all(resizePromises);
-        }).then(function (resizedImages) {
-          return resizedImages.map(function (_ref3) {
-            var resizedImageData = _ref3.resizedImageData,
-                imageType = _ref3.imageType;
-            return _this.convertToBlob(resizedImageData, imageType);
-          });
-        }).then(function (imagesFiles) {
-          return _this.handleUpload({ imagesFiles: imagesFiles });
-        }).catch(function (e) {
-          return _this.onError(e);
-        });
-      };
-
-      _this.handleUpload = function (_ref4) {
-        var imageData = _ref4.imageData,
-            imageType = _ref4.imageType,
-            blob = _ref4.blob,
-            imagesFiles = _ref4.imagesFiles;
-
-        if (imagesFiles) {
-          _this.props.onFileSelect(imagesFiles);
-          _this.setState({
-            imagePreviewUrl: '',
-            imageType: ''
-          });
-        } else if (_this.immediateUpload) {
-          _this.props.onFileSelect([blob || _this.convertToBlob(imageData, imageType)]);
-          _this.setState({
-            imagePreviewUrl: '',
-            imageType: ''
-          });
-        } else {
-          _this.props.onFileSelect([blob || _this.convertToBlob(imageData, imageType)]);
-          _this.setState({
-            imagePreviewUrl: imageData,
-            imageType: imageType
-          });
-        }
-      };
-
-      _this.clearImageData = function (deleteImage) {
-        _this.setState({ imagePreviewUrl: '' });
-        _this.props.onFileSelect('');
-        if (deleteImage && _this.props.savedImage) {
-          _this.props.onImageDelete();
-        }
-      };
-
-      _this.state = {
-        imagePreviewUrl: '',
-        isCropperOpen: false,
-        imageType: ''
-      };
-      if (props.options) {
-        _this.resize = props.options.resize !== false;
-        _this.crop = props.options.crop !== false;
-        _this.immediateUpload = props.options.immediateUpload;
-        _this.maxWidth = props.options.maxWidth || 400;
-        _this.maxHeight = props.options.maxHeight || 300;
-      } else {
-        _this.maxWidth = _this.defaultMaxImageWidth;
-        _this.maxHeight = _this.defaultMaxImageHeight;
-      }
-      return _this;
-    }
-
-    _createClass(ImageField, [{
-      key: 'render',
-      value: function render() {
-        var _this2 = this;
-
-        var _props = this.props,
-            savedImage = _props.savedImage,
-            isUploading = _props.isUploading,
-            options = _props.options,
-            props = _objectWithoutProperties(_props, ['savedImage', 'isUploading', 'options']);
-
-        var cropAspectRatio = options && options.cropAspectRatio;
-        var imagePreviewUrl = this.state.imagePreviewUrl;
-
-        return _react2.default.createElement(
+    // TODO uapasha return error if crop and multiple images selected instead of failing quietly
+    var multipleUpload = other.options.multipleUpload && !other.options.crop || false;
+    return _react2.default.createElement(
+      'div',
+      null,
+      _react2.default.createElement(
+        'div',
+        { style: styles.root },
+        isUploading ? _react2.default.createElement(
           'div',
-          null,
-          _react2.default.createElement(
-            'div',
-            { style: styles.root },
-            isUploading ? _react2.default.createElement(
-              'div',
-              { style: styles.uploading.root },
-              _react2.default.createElement(_CircularProgress2.default, { style: styles.uploading.progress })
-            ) : '',
-            _react2.default.createElement(_imagePreview2.default, _extends({
-              imageUrl: imagePreviewUrl || savedImage,
-              setImageUrl: this.handleNewUrl,
-              clearImageData: this.clearImageData,
-              options: options
-            }, props))
-          ),
-          _react2.default.createElement(_cropperDialog2.default, {
-            imagePreviewUrl: this.state.imagePreviewUrl,
-            imageType: this.state.imageType,
-            open: this.state.isCropperOpen,
-            closeDialog: function closeDialog() {
-              return _this2.setState({ isCropperOpen: false });
-            },
-            onCrop: this.onCrop,
-            cropAspectRatio: cropAspectRatio
-          })
-        );
-      }
-    }]);
-
-    return ImageField;
-  }(_react.Component);
+          { style: styles.uploading.root },
+          _react2.default.createElement(_CircularProgress2.default, { style: styles.uploading.progress })
+        ) : '',
+        multipleUpload ? _react2.default.createElement(_multipleImages2.default, other) : _react2.default.createElement(_singleImage2.default, other)
+      )
+    );
+  };
 
   ImageField.propTypes = {
     /**
@@ -382,8 +128,22 @@
      * @param {bool} [options.immediateUpload = false] - upload image immediately
      * @param {bool} [multipleUpload = false] - able to select and upload multiple images at once
      * is supported only if no crop applied
+     * @ param {object} [sizes] - sizes for saving images in multiple sizes for example:
+     * {
+     *   small: {
+     *     maxWidth: 400,
+     *     maxHeight: 300,
+     *   },
+     *   medium: {
+     *     maxWidth: 700,
+     *   },
+     *   large: {
+     *    maxWidth: 1024,
+     *    },
+     * }
      */
     options: _react.PropTypes.object
   };
+
   exports.default = ImageField;
 });
