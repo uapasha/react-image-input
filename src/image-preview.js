@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import Avatar from 'material-ui/Avatar';
-import { IconButton } from 'material-ui';
+import { IconButton, RaisedButton } from 'material-ui';
 import ImageIcon from 'material-ui/svg-icons/image/image';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import FileUpload from 'material-ui/svg-icons/file/file-upload';
@@ -80,20 +80,43 @@ class ImagePreview extends Component {
 
   onFileChange = (e) => {
     const { files } = e.target;
+    console.log('onFileChange files.length: ', files.length);
     if (!files.length) {
       this.props.clearImageData();
-    } else if (this.multipleUpload) {
+    } else if (this.multipleUpload && files.length > 1) {
       this.handleMultipleFiles(files);
     } else if (files.length === 1) {
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onloadend = () => {
-        const { imageType } = this.checkFile(reader.result);
-        if (!imageType) return;
-        this.props.setImageUrl({ imageData: reader.result, imageType });
-      };
+      if (!typeof files[0] instanceof Blob) {
+        this.props.setImageUrl({ imageData: files[0], imageType: 'image/jpeg' });
+      } else {
+        const reader = new FileReader();
+        reader.readAsDataURL(files[0]);
+        reader.onloadend = () => {
+          const { imageType } = this.checkFile(reader.result);
+          if (!imageType) return;
+          this.props.setImageUrl({ imageData: reader.result, imageType });
+        };
+      }
     }
     this.refs.imageInput.value = null;
+  };
+
+  handleCordovaImage = () => {
+    const onDeviceReady = () => {
+      navigator.camera.getPicture(
+        (url) => this.onFileChange({ target: { files: [`data:image/jpeg;base64,${url}`] } }),
+        (e) => console.error(e), {
+          quality: 50,
+          targetHeight: 1024,
+          targetWidth: 1024,
+          sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
+          destinationType: Camera.DestinationType.DATA_URL,
+          mediaType: Camera.MediaType.PICTURE,
+          correctOrientation: true,
+        }
+      );
+    };
+    document.addEventListener('deviceready', onDeviceReady, false);
   };
 
   checkFile = (imageUrl) => {
@@ -146,21 +169,24 @@ class ImagePreview extends Component {
   render() {
     return (
       <IconButton
-        containerElement="label"
+        containerElement={!navigator.camera ? 'label' : 'div'}
         style={imagePreviewStyles.root}
         onMouseEnter={() => this.setState({ isHovered: true })}
         onMouseLeave={() => this.setState({ isHovered: false })}
+        onTouchTap={navigator.camera ? this.handleCordovaImage : () => {}}
       >
         {this.renderPreview()}
-        <input
-          ref="imageInput"
-          style={imagePreviewStyles.input}
-          accept={this.acceptFileTypes}
-          size="1000"
-          type="file"
-          multiple={this.multipleUpload}
-          onChange={this.onFileChange}
-        />
+        {!navigator.camera
+          ? <input
+            ref="imageInput"
+            style={imagePreviewStyles.input}
+            accept={this.acceptFileTypes}
+            size="1000"
+            type="file"
+            multiple={this.multipleUpload}
+            onChange={this.onFileChange}
+          />
+          : ''}
         {this.state.isHovered
           ? <div style={imagePreviewStyles.onHover.root}>
             <FileUpload style={imagePreviewStyles.onHover.uploadIcon} />
