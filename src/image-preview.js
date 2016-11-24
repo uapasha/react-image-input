@@ -7,7 +7,7 @@ import FileUpload from 'material-ui/svg-icons/file/file-upload';
 import images from './utils/images';
 import messages from './utils/messages';
 
-const styles = {
+const imagePreviewStyles = {
   root: {
     width: 'initial',
     height: '100%',
@@ -47,6 +47,7 @@ const styles = {
   },
 };
 
+const defaultFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
 class ImagePreview extends Component {
   static propTypes ={
@@ -73,7 +74,7 @@ class ImagePreview extends Component {
         && !this.props.options.crop
         || false;
     } else {
-      this.allowedFileTypes = this.defaultFileTypes;
+      this.allowedFileTypes = defaultFileTypes;
     }
   }
 
@@ -129,7 +130,7 @@ class ImagePreview extends Component {
     const fullWidth = options && options.fullWidth;
     if (fullWidth && imageUrl) {
       return (
-        <img src={imageUrl} style={styles.fullWidthPicture} alt="event" />
+        <img src={imageUrl} style={imagePreviewStyles.fullWidthPicture} alt="event" />
       );
     }
     if (imageUrl) {
@@ -139,21 +140,21 @@ class ImagePreview extends Component {
     }
     return DefaultImage
       ? <DefaultImage />
-      : <ImageIcon style={styles.imageIcon} />;
+      : <ImageIcon style={imagePreviewStyles.imageIcon} />;
   };
 
   render() {
     return (
       <IconButton
         containerElement="label"
-        style={styles.root}
+        style={imagePreviewStyles.root}
         onMouseEnter={() => this.setState({ isHovered: true })}
         onMouseLeave={() => this.setState({ isHovered: false })}
       >
         {this.renderPreview()}
         <input
           ref="imageInput"
-          style={styles.input}
+          style={imagePreviewStyles.input}
           accept={this.acceptFileTypes}
           size="1000"
           type="file"
@@ -161,11 +162,11 @@ class ImagePreview extends Component {
           onChange={this.onFileChange}
         />
         {this.state.isHovered
-          ? <div style={styles.onHover.root}>
-            <FileUpload style={styles.onHover.uploadIcon} />
+          ? <div style={imagePreviewStyles.onHover.root}>
+            <FileUpload style={imagePreviewStyles.onHover.uploadIcon} />
             {this.props.imageUrl ?
               <IconButton
-                style={styles.onHover.deleteIcon}
+                style={imagePreviewStyles.onHover.deleteIcon}
                 onTouchTap={() => this.props.clearImageData(true)}
                 tooltip={messages['delete_image']}
               >

@@ -8,7 +8,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import SingleImage from './single-image';
 import MultipleImages from './multiple-images';
 
-const styles = {
+const imageFieldStyles = {
   root: {
     textAlign: 'center',
     position: 'relative',
@@ -32,19 +32,22 @@ const styles = {
 
 const ImageField = (props) => {
   const { isUploading, ...other } = props;
-  // TODO uapasha return error if crop and multiple images selected instead of failing quietly
-  const multipleUpload = other.options.multipleUpload
-    && !other.options.crop
-    || false;
+  if (other.options && other.options.crop && other.options.multipleUpload) {
+    throw new Error(
+      'Crop with multiple image upload is not implemented. '
+      + 'Please remove crop or multiple upload from react-image-field component options'
+    );
+  }
+  const multipleUpload = !!(other.options && other.options.multipleUpload);
   return (
     <div>
-      <div style={styles.root}>
+      <div style={imageFieldStyles.root}>
         {isUploading
-          ? <div style={styles.uploading.root}>
-            <CircularProgress style={styles.uploading.progress} />
+          ? <div style={imageFieldStyles.uploading.root}>
+            <CircularProgress style={imageFieldStyles.uploading.progress} />
           </div>
           : ''}
-          {multipleUpload
+        {multipleUpload
           ? <MultipleImages {...other} />
           : <SingleImage {...other} />}
       </div>

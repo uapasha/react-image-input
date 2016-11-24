@@ -154,7 +154,6 @@ class ImageField extends Component {
 
   clearImageData = (deleteImage) => {
     this.setState({ imagePreviewUrl: '' });
-    this.props.onFileSelect('');
     if (deleteImage && this.props.savedImage) {
       this.props.onImageDelete();
     }

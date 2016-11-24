@@ -7,13 +7,12 @@ import messages from './utils/messages';
 
 
 // TODO uapasha handle style
-const cropStyle = {
-  height: 300,
-  width: '100%',
-};
 
-const styles = {
-  cropper: cropStyle,
+const cropStyles = {
+  cropper: {
+    height: 300,
+    width: '100%',
+  },
 };
 
 class CropperDialog extends React.Component {
@@ -53,7 +52,7 @@ class CropperDialog extends React.Component {
           ? <Cropper
             ref="cropper"
             src={imagePreviewUrl}
-            style={styles.cropper}
+            style={cropStyles.cropper}
             viewMode={2}
             aspectRatio={cropAspectRatio || 1}
             guides={false}
