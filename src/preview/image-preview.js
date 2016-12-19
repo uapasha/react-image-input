@@ -78,9 +78,9 @@ class ImagePreview extends Component {
           quality: 50,
           targetHeight: maxHeight || 1024,
           targetWidth: maxWidth || 1024,
-          sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
-          destinationType: Camera.DestinationType.DATA_URL,
-          mediaType: Camera.MediaType.PICTURE,
+          sourceType: window.Camera.PictureSourceType.SAVEDPHOTOALBUM,
+          destinationType: window.Camera.DestinationType.DATA_URL,
+          mediaType: window.Camera.MediaType.PICTURE,
           correctOrientation: true,
         }
       );

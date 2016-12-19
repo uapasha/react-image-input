@@ -54,6 +54,7 @@ class ImageField extends Component {
      * is supported only if no crop applied
      */
     options: PropTypes.object,
+    isCordova: PropTypes.bool,
   };
 
   constructor(props) {
@@ -64,7 +65,7 @@ class ImageField extends Component {
       imageType: '',
     };
     if (props.options) {
-      if (props.options.cordova) {
+      if (props.isCordova) {
         this.resize = false;
       } else {
         this.resize = props.options.resize !== false;

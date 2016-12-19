@@ -39,7 +39,7 @@ const ImageField = (props) => {
     );
   }
   const multipleUpload = !!(other.options && other.options.multipleUpload);
-  const cordovaUpload = !!(other.options && other.options.cordova);
+  const cordovaUpload = navigator && navigator.camera && window.Camera;
 
   let workingComponent;
   if (!multipleUpload || cordovaUpload) {
