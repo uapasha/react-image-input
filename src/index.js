@@ -1,6 +1,6 @@
 import ImageField from './image-field';
 import FormsyImageField from './formsy-image-field';
-import ImagePreview from './image-preview';
+import ImagePreview from './preview/image-preview';
 
 export {
   FormsyImageField,

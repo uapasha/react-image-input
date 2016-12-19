@@ -39,6 +39,14 @@ const ImageField = (props) => {
     );
   }
   const multipleUpload = !!(other.options && other.options.multipleUpload);
+  const cordovaUpload = !!(other.options && other.options.cordova);
+
+  let workingComponent;
+  if (!multipleUpload || cordovaUpload) {
+    workingComponent = (<SingleImage isCordova={cordovaUpload} {...other} />);
+  }
+  if (multipleUpload) workingComponent = (<MultipleImages {...other} />);
+
   return (
     <div>
       <div style={imageFieldStyles.root}>
@@ -47,9 +55,7 @@ const ImageField = (props) => {
             <CircularProgress style={imageFieldStyles.uploading.progress} />
           </div>
           : ''}
-        {multipleUpload
-          ? <MultipleImages {...other} />
-          : <SingleImage {...other} />}
+        {workingComponent}
       </div>
     </div>
   );

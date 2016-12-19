@@ -35,14 +35,13 @@
     "test-watch": "npm run testonly -- --watch --watch-extensions js"
   },
   "dependencies": {
-    "react-cropper": "^0.9.4",
-    "material-ui": "0.16.1",
-    "formsy-react": "^0.18.1"
+    "react-cropper": "^0.9.4"
   },
   "peerDependencies": {
     "react": "^15.0.0",
     "material-ui": "0.16.1",
-    "react-tap-event-plugin": "^1.0.0"
+    "react-tap-event-plugin": "^1.0.0",
+    "formsy-react": "^0.18.1"
   },
   "devDependencies": {
     "babel-cli": "^6.6.4",

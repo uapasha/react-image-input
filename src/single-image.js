@@ -6,7 +6,7 @@
 import React, { PropTypes, Component } from 'react';
 import images from './utils/images';
 import CropperDialog from './cropper-dialog';
-import ImagePreview from './image-preview';
+import ImagePreview from './preview/image-preview';
 
 class ImageField extends Component {
   static propTypes = {
@@ -64,7 +64,11 @@ class ImageField extends Component {
       imageType: '',
     };
     if (props.options) {
-      this.resize = props.options.resize !== false;
+      if (props.options.cordova) {
+        this.resize = false;
+      } else {
+        this.resize = props.options.resize !== false;
+      }
       this.crop = props.options.crop !== false;
       this.immediateUpload = props.options.immediateUpload;
       this.maxWidth = props.options.maxWidth || 400;
