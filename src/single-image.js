@@ -175,6 +175,9 @@ class ImageField extends Component {
           clearImageData={this.clearImageData}
           options={options}
           {...props}
+          maxWidth={this.maxWidth}
+          maxHeight={this.maxHeight}
+          resize={options && options.resize !== false}
         />
         <CropperDialog
           imagePreviewUrl={this.state.imagePreviewUrl}

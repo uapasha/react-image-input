@@ -18,6 +18,9 @@ class ImagePreview extends Component {
     onError: PropTypes.func,
     options: PropTypes.object,
     isCordova: PropTypes.bool,
+    maxWidth: PropTypes.number,
+    maxHeight: PropTypes.number,
+    resize: PropTypes.bool,
   };
 
   constructor(props) {
@@ -57,16 +60,24 @@ class ImagePreview extends Component {
   };
 
   handleCordovaImage = () => {
+    const { resize } = this.props;
+    let maxWidth;
+    let maxHeight;
+    if (resize) {
+      maxWidth = this.props.maxWidth;
+      maxHeight = this.props.maxHeight;
+    }
     const onDeviceReady = () => {
       if (!navigator || !navigator.camera) {
         throw new Error('Camera plugin is not available');
       }
       navigator.camera.getPicture(
         (url) => this.onFileChange({ target: { files: [`data:image/jpeg;base64,${url}`] } }),
-        (e) => console.error(e), {
+        (e) => console.error(e),
+        {
           quality: 50,
-          targetHeight: 1024,
-          targetWidth: 1024,
+          targetHeight: maxHeight || 1024,
+          targetWidth: maxWidth || 1024,
           sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
           destinationType: Camera.DestinationType.DATA_URL,
           mediaType: Camera.MediaType.PICTURE,

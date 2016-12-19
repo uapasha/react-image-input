@@ -52,16 +52,16 @@ class CordovaPreview extends Component {
       <div>
         <IconButton
           style={imagePreviewStyles.root}
-          onTouchTap={this.handleTouch}
+          onTouchTap={!this.state.isActive ? this.handleTouch : () => {}}
         >
+          <ActiveOverlay
+            isActive={this.state.isActive}
+            imageExists={!!imageUrl}
+            clearImageData={clearImageData}
+            onUploadTouch={this.handleTouch}
+          />
           <Preview DefaultImage={DefaultImage} fullWidth={fullWidth} imageUrl={imageUrl} />
         </IconButton>
-        <ActiveOverlay
-          isActive={this.state.isActive}
-          imageExists={!!imageUrl}
-          clearImageData={clearImageData}
-          onUploadTouch={this.handleTouch}
-        />
       </div>
     );
   }
