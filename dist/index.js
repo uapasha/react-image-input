@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', './image-field', './formsy-image-field', './image-preview'], factory);
+    define(['exports', './image-field', './formsy-image-field', './preview/image-preview'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('./image-field'), require('./formsy-image-field'), require('./image-preview'));
+    factory(exports, require('./image-field'), require('./formsy-image-field'), require('./preview/image-preview'));
   } else {
     var mod = {
       exports: {}

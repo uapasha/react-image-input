@@ -31,6 +31,63 @@
     };
   }
 
+  var _jsx = function () {
+    var REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7;
+    return function createRawReactElement(type, props, key, children) {
+      var defaultProps = type && type.defaultProps;
+      var childrenLength = arguments.length - 3;
+
+      if (!props && childrenLength !== 0) {
+        props = {};
+      }
+
+      if (props && defaultProps) {
+        for (var propName in defaultProps) {
+          if (props[propName] === void 0) {
+            props[propName] = defaultProps[propName];
+          }
+        }
+      } else if (!props) {
+        props = defaultProps || {};
+      }
+
+      if (childrenLength === 1) {
+        props.children = children;
+      } else if (childrenLength > 1) {
+        var childArray = Array(childrenLength);
+
+        for (var i = 0; i < childrenLength; i++) {
+          childArray[i] = arguments[i + 3];
+        }
+
+        props.children = childArray;
+      }
+
+      return {
+        $$typeof: REACT_ELEMENT_TYPE,
+        type: type,
+        key: key === undefined ? null : '' + key,
+        ref: null,
+        props: props,
+        _owner: null
+      };
+    };
+  }();
+
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
   function _objectWithoutProperties(obj, keys) {
     var target = {};
 
@@ -43,7 +100,7 @@
     return target;
   }
 
-  var styles = {
+  var imageFieldStyles = {
     root: {
       textAlign: 'center',
       position: 'relative'
@@ -69,80 +126,25 @@
     var isUploading = props.isUploading,
         other = _objectWithoutProperties(props, ['isUploading']);
 
-    // TODO uapasha return error if crop and multiple images selected instead of failing quietly
-    var multipleUpload = other.options.multipleUpload && !other.options.crop || false;
-    return _react2.default.createElement(
-      'div',
-      null,
-      _react2.default.createElement(
-        'div',
-        { style: styles.root },
-        isUploading ? _react2.default.createElement(
-          'div',
-          { style: styles.uploading.root },
-          _react2.default.createElement(_CircularProgress2.default, { style: styles.uploading.progress })
-        ) : '',
-        multipleUpload ? _react2.default.createElement(_multipleImages2.default, other) : _react2.default.createElement(_singleImage2.default, other)
-      )
-    );
-  };
+    if (other.options && other.options.crop && other.options.multipleUpload) {
+      throw new Error('Crop with multiple image upload is not implemented. ' + 'Please remove crop or multiple upload from react-image-field component options');
+    }
+    var multipleUpload = !!(other.options && other.options.multipleUpload);
+    var cordovaUpload = !!(other.options && other.options.cordova);
 
-  ImageField.propTypes = {
-    /**
-     *  @param {string} [savedImage] - url to image that is already saved
-     */
-    savedImage: _react.PropTypes.string,
-    /**
-     * @param {function} [defaultImage] - React component that renders
-     * placeholder if savedImage is not provided
-     */
-    defaultImage: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object]),
-    /**
-     * @param {function} onFileSelect - will be called when image selection
-     * process is completed. Returns an array of Blobs
-     */
-    onFileSelect: _react.PropTypes.func.isRequired,
-    /**
-     *  @param {function} [onError] - callback called when user select wrong fileType
-     */
-    onError: _react.PropTypes.func,
-    /**
-     * @param {bool} [isUploading] - state of uploading of the image
-     * be called when left button is pressed
-     */
-    isUploading: _react.PropTypes.bool,
-    /**
-     *  @param {function} onImageDelete - callback called when deleteImage button pressed
-     */
-    onImageDelete: _react.PropTypes.func,
-    /**
-     * @param {object} [options] - options for the component
-     * @param {array} [options.allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif']] -
-     * allowed file types in form of 'image/jpeg'
-     * @param {bool} [options.fullWidth = false] - format of the image to be displayed
-     * @param {bool} [options.resize = true] - resize image before upload
-     * @param {number} [options.maxHeight = 300] - max value for height of resized image in px
-     * @param {number} [options.maxWidth = 400] - max value for width of resized image in px
-     * @crop {bool} [options.crop = true] - crop image before upload
-     * @param {number} [options.cropAspectRatio = 1] - cropAspectRatio
-     * @param {bool} [options.immediateUpload = false] - upload image immediately
-     * @param {bool} [multipleUpload = false] - able to select and upload multiple images at once
-     * is supported only if no crop applied
-     * @ param {object} [sizes] - sizes for saving images in multiple sizes for example:
-     * {
-     *   small: {
-     *     maxWidth: 400,
-     *     maxHeight: 300,
-     *   },
-     *   medium: {
-     *     maxWidth: 700,
-     *   },
-     *   large: {
-     *    maxWidth: 1024,
-     *    },
-     * }
-     */
-    options: _react.PropTypes.object
+    var workingComponent = void 0;
+    if (!multipleUpload || cordovaUpload) {
+      workingComponent = _react2.default.createElement(_singleImage2.default, _extends({ isCordova: cordovaUpload }, other));
+    }
+    if (multipleUpload) workingComponent = _react2.default.createElement(_multipleImages2.default, other);
+
+    return _jsx('div', {}, void 0, _jsx('div', {
+      style: imageFieldStyles.root
+    }, void 0, isUploading ? _jsx('div', {
+      style: imageFieldStyles.uploading.root
+    }, void 0, _jsx(_CircularProgress2.default, {
+      style: imageFieldStyles.uploading.progress
+    })) : '', workingComponent));
   };
 
   exports.default = ImageField;

@@ -60,9 +60,5 @@
     return _react2.default.createElement(_imageField2.default, _extends({ onFileSelect: setValue }, props));
   };
 
-  FormsyImageField.propTypes = {
-    setValue: _react.PropTypes.func
-  };
-
   exports.default = (0, _formsyReact.HOC)(FormsyImageField);
 });
