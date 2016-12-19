@@ -254,7 +254,7 @@
         imageType: ''
       };
       if (props.options) {
-        if (props.options.cordova) {
+        if (props.isCordova) {
           _this.resize = false;
         } else {
           _this.resize = props.options.resize !== false;

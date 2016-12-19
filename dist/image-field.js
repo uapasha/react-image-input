@@ -130,7 +130,7 @@
       throw new Error('Crop with multiple image upload is not implemented. ' + 'Please remove crop or multiple upload from react-image-field component options');
     }
     var multipleUpload = !!(other.options && other.options.multipleUpload);
-    var cordovaUpload = !!(other.options && other.options.cordova);
+    var cordovaUpload = navigator && navigator.camera && window.Camera;
 
     var workingComponent = void 0;
     if (!multipleUpload || cordovaUpload) {
