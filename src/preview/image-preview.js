@@ -13,6 +13,7 @@ class ImagePreview extends Component {
     DefaultImage: PropTypes.oneOfType([
       PropTypes.func, PropTypes.object,
     ]),
+    onImageSizeGet: PropTypes.func,
     clearImageData: PropTypes.func,
     setImageUrl: PropTypes.func,
     onError: PropTypes.func,
@@ -38,6 +39,8 @@ class ImagePreview extends Component {
   }
 
   onFileChange = (e) => {
+    const { onImageSizeGet, setImageUrl } = this.props;
+    console.log(onImageSizeGet);
     const { files } = e.target;
     if (!files.length) {
       this.props.clearImageData();
@@ -45,14 +48,28 @@ class ImagePreview extends Component {
       this.handleMultipleFiles(files);
     } else if (files.length === 1) {
       if (!(files[0] instanceof File)) {
-        this.props.setImageUrl({ imageData: files[0], imageType: 'image/jpeg' });
+        if (onImageSizeGet) {
+          const image = new Image();
+          image.src = files[0];
+          image.onload = () => {
+            onImageSizeGet({ width: image.width, height: image.height });
+          };
+        }
+        setImageUrl({ imageData: files[0], imageType: 'image/jpeg' });
       } else {
         const reader = new FileReader();
         reader.readAsDataURL(files[0]);
         reader.onloadend = () => {
           const { imageType } = this.checkFile(reader.result);
           if (!imageType) return;
-          this.props.setImageUrl({ imageData: reader.result, imageType });
+          if (onImageSizeGet) {
+            const image = new Image();
+            image.src = reader.result;
+            image.onload = () => {
+              onImageSizeGet({ width: image.width, height: image.height });
+            };
+          }
+          setImageUrl({ imageData: reader.result, imageType });
         };
       }
     }
@@ -101,6 +118,7 @@ class ImagePreview extends Component {
   };
 
   handleMultipleFiles = (files) => {
+    const { onImageSizeGet, setImageUrl } = this.props;
     const promisifiedImagesUrls = [];
     Array.prototype.forEach.call(files, (file) => {
       const promisifiedReader = new Promise((resolve, reject) => {
@@ -108,13 +126,20 @@ class ImagePreview extends Component {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
           const { imageType } = this.checkFile(reader.result);
+          if (onImageSizeGet) {
+            const image = new Image();
+            image.src = reader.result;
+            image.onload = () => {
+              onImageSizeGet({ width: image.width, height: image.height });
+            };
+          }
           if (!imageType) reject('File type is not supported');
           resolve({ imageData: reader.result, imageType });
         };
       });
       promisifiedImagesUrls.push(promisifiedReader);
     });
-    this.props.setImageUrl({ promisifiedImagesUrls });
+    setImageUrl({ promisifiedImagesUrls });
   };
 
   render() {
