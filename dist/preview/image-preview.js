@@ -135,6 +135,9 @@
       var _this = _possibleConstructorReturn(this, (ImagePreview.__proto__ || Object.getPrototypeOf(ImagePreview)).call(this, props));
 
       _this.onFileChange = function (e) {
+        var _this$props = _this.props,
+            onImageSizeGet = _this$props.onImageSizeGet,
+            setImageUrl = _this$props.setImageUrl;
         var files = e.target.files;
 
         if (!files.length) {
@@ -143,7 +146,16 @@
           _this.handleMultipleFiles(files);
         } else if (files.length === 1) {
           if (!(files[0] instanceof File)) {
-            _this.props.setImageUrl({ imageData: files[0], imageType: 'image/jpeg' });
+            if (onImageSizeGet) {
+              (function () {
+                var image = new Image();
+                image.src = files[0];
+                image.onload = function () {
+                  onImageSizeGet({ width: image.width, height: image.height });
+                };
+              })();
+            }
+            setImageUrl({ imageData: files[0], imageType: 'image/jpeg' });
           } else {
             (function () {
               var reader = new FileReader();
@@ -153,7 +165,16 @@
                     imageType = _this$checkFile.imageType;
 
                 if (!imageType) return;
-                _this.props.setImageUrl({ imageData: reader.result, imageType: imageType });
+                if (onImageSizeGet) {
+                  (function () {
+                    var image = new Image();
+                    image.src = reader.result;
+                    image.onload = function () {
+                      onImageSizeGet({ width: image.width, height: image.height });
+                    };
+                  })();
+                }
+                setImageUrl({ imageData: reader.result, imageType: imageType });
               };
             })();
           }
@@ -203,6 +224,10 @@
       };
 
       _this.handleMultipleFiles = function (files) {
+        var _this$props2 = _this.props,
+            onImageSizeGet = _this$props2.onImageSizeGet,
+            setImageUrl = _this$props2.setImageUrl;
+
         var promisifiedImagesUrls = [];
         Array.prototype.forEach.call(files, function (file) {
           var promisifiedReader = new Promise(function (resolve, reject) {
@@ -213,12 +238,22 @@
                   imageType = _this$checkFile2.imageType;
 
               if (!imageType) reject('File type is not supported');
-              resolve({ imageData: reader.result, imageType: imageType });
+              if (!onImageSizeGet) resolve({ imageData: reader.result, imageType: imageType });else {
+                (function () {
+                  var image = new Image();
+                  image.src = reader.result;
+                  image.onload = function () {
+                    onImageSizeGet({ width: image.width, height: image.height }, function () {
+                      resolve({ imageData: reader.result, imageType: imageType });
+                    });
+                  };
+                })();
+              }
             };
           });
           promisifiedImagesUrls.push(promisifiedReader);
         });
-        _this.props.setImageUrl({ promisifiedImagesUrls: promisifiedImagesUrls });
+        setImageUrl({ promisifiedImagesUrls: promisifiedImagesUrls });
       };
 
       if (props.options) {
