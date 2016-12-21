@@ -40,7 +40,6 @@ class ImagePreview extends Component {
 
   onFileChange = (e) => {
     const { onImageSizeGet, setImageUrl } = this.props;
-    console.log(onImageSizeGet);
     const { files } = e.target;
     if (!files.length) {
       this.props.clearImageData();
@@ -126,15 +125,17 @@ class ImagePreview extends Component {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
           const { imageType } = this.checkFile(reader.result);
-          if (onImageSizeGet) {
+          if (!imageType) reject('File type is not supported');
+          if (!onImageSizeGet) resolve({ imageData: reader.result, imageType });
+          else {
             const image = new Image();
             image.src = reader.result;
             image.onload = () => {
-              onImageSizeGet({ width: image.width, height: image.height });
+              onImageSizeGet({ width: image.width, height: image.height }, () => {
+                resolve({ imageData: reader.result, imageType });
+              });
             };
           }
-          if (!imageType) reject('File type is not supported');
-          resolve({ imageData: reader.result, imageType });
         };
       });
       promisifiedImagesUrls.push(promisifiedReader);
