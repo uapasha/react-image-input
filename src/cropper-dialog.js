@@ -20,14 +20,15 @@ class CropperDialog extends React.Component {
     onCrop: PropTypes.func,
     open: PropTypes.bool,
     cropAspectRatio: PropTypes.number,
+    alwaysCrop: PropTypes.bool,
   };
 
   getActions = () => ([
-    <FlatButton
+    !this.props.alwaysCrop ? <FlatButton
       label={messages['dont_crop']}
       primary
       onTouchTap={this.handleClose}
-    />,
+    /> : null,
     <FlatButton
       label={messages['crop']}
       primary

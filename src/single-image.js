@@ -174,7 +174,7 @@ class ImageField extends Component {
   };
 
   render() {
-    const { savedImage, options, alwaysCrop, ...props } = this.props;
+    const { savedImage, options, ...props } = this.props;
     const cropAspectRatio = options && options.cropAspectRatio;
     const { imagePreviewUrl } = this.state;
     return (
@@ -195,7 +195,7 @@ class ImageField extends Component {
           open={this.state.isCropperOpen}
           cancelDialog={this.handleCancelCrop}
           onCrop={this.onCrop}
-          alwaysCrop={alwaysCrop}
+          alwaysCrop={options && options.alwaysCrop}
           cropAspectRatio={cropAspectRatio}
         />
       </div>
