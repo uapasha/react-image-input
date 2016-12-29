@@ -175,11 +175,16 @@
           var reader = new FileReader();
           reader.readAsDataURL(blob);
           reader.onloadend = function () {
-            _this.handleUpload({
-              imageData: reader.result,
-              imageType: _this.state.imageType,
-              blob: blob
-            });
+            if (!_this.resize) {
+              _this.handleUpload({
+                imageData: reader.result,
+                imageType: _this.state.imageType,
+                blob: blob
+              });
+            } else {
+              _this.resizeAndUpload(reader.result, _this.state.imageType);
+            }
+            _this.setState({ isCropperOpen: false });
           };
         }, '' + _this.state.imageType);
       };
@@ -193,38 +198,21 @@
             imageData: imageData,
             imageType: imageType
           });
-        } else if (_this.resize) {
-          _images2.default.resizeImage(imageData, imageType, _this.maxWidth, _this.maxHeight).then(function (_ref) {
-            var resizedImageData = _ref.resizedImageData;
-
-            if (_this.crop) {
-              _this.setState({
-                imagePreviewUrl: resizedImageData,
-                imageType: imageType,
-                isCropperOpen: true
-              });
-            } else {
-              _this.handleUpload({
-                imageData: resizedImageData,
-                imageType: imageType
-              });
-            }
-          }).catch(function (err) {
-            return _this.props.onError(err);
-          });
         } else if (_this.crop) {
           _this.setState({
             imagePreviewUrl: imageData,
             imageType: imageType,
             isCropperOpen: true
           });
+        } else if (_this.resize) {
+          _this.resizeAndUpload(imageData, imageType);
         }
       };
 
-      _this.handleUpload = function (_ref2) {
-        var imageData = _ref2.imageData,
-            imageType = _ref2.imageType,
-            blob = _ref2.blob;
+      _this.handleUpload = function (_ref) {
+        var imageData = _ref.imageData,
+            imageType = _ref.imageType,
+            blob = _ref.blob;
 
         if (_this.immediateUpload) {
           _this.props.onFileSelect([blob || _images2.default.convertToBlob(imageData, imageType)]);
@@ -241,11 +229,35 @@
         }
       };
 
+      _this.handleCancelCrop = function () {
+        var _this$state = _this.state,
+            imageData = _this$state.imagePreviewUrl,
+            imageType = _this$state.imageType;
+
+        if (!_this.resize) {
+          _this.handleUpload({ imageData: imageData, imageType: imageType });
+        } else _this.resizeAndUpload(imageData, imageType);
+        _this.setState({ isCropperOpen: false });
+      };
+
       _this.clearImageData = function (deleteImage) {
         _this.setState({ imagePreviewUrl: '' });
         if (deleteImage && _this.props.savedImage) {
           _this.props.onImageDelete();
         }
+      };
+
+      _this.resizeAndUpload = function (imageData, imageType) {
+        _images2.default.resizeImage(imageData, imageType, _this.maxWidth, _this.maxHeight).then(function (_ref2) {
+          var resizedImageData = _ref2.resizedImageData;
+
+          _this.handleUpload({
+            imageData: resizedImageData,
+            imageType: imageType
+          });
+        }).catch(function (err) {
+          return _this.props.onError(err);
+        });
       };
 
       _this.state = {
@@ -273,8 +285,6 @@
     _createClass(ImageField, [{
       key: 'render',
       value: function render() {
-        var _this2 = this;
-
         var _props = this.props,
             savedImage = _props.savedImage,
             options = _props.options,
@@ -296,10 +306,9 @@
           imagePreviewUrl: this.state.imagePreviewUrl,
           imageType: this.state.imageType,
           open: this.state.isCropperOpen,
-          closeDialog: function closeDialog() {
-            return _this2.setState({ isCropperOpen: false });
-          },
+          cancelDialog: this.handleCancelCrop,
           onCrop: this.onCrop,
+          alwaysCrop: options && options.alwaysCrop,
           cropAspectRatio: cropAspectRatio
         }));
       }

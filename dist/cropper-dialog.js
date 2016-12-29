@@ -124,8 +124,6 @@
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
-  // TODO uapasha handle style
-
   var cropStyles = {
     cropper: {
       height: 300,
@@ -148,19 +146,22 @@
       }
 
       return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = CropperDialog.__proto__ || Object.getPrototypeOf(CropperDialog)).call.apply(_ref, [this].concat(args))), _this), _this.getActions = function () {
-        return [_jsx(_FlatButton2.default, {
+        return [!_this.props.alwaysCrop ? _jsx(_FlatButton2.default, {
+          label: _messages2.default['dont_crop'],
+          primary: true,
+          onTouchTap: _this.handleClose
+        }) : null, _jsx(_FlatButton2.default, {
           label: _messages2.default['crop'],
           primary: true,
           keyboardFocused: true,
           onTouchTap: _this.handleCrop
         })];
       }, _this.handleCrop = function () {
-        var _this$props = _this.props,
-            onCrop = _this$props.onCrop,
-            closeDialog = _this$props.closeDialog;
+        var onCrop = _this.props.onCrop;
 
         onCrop(_this.refs.cropper.getCroppedCanvas());
-        closeDialog();
+      }, _this.handleClose = function () {
+        _this.props.cancelDialog();
       }, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
@@ -176,7 +177,8 @@
           title: _messages2.default['crop_image'],
           actions: this.getActions(),
           modal: true,
-          open: open
+          open: open,
+          onRequestClose: this.handleClose
         }, void 0, open ? _react2.default.createElement(_reactCropper2.default, {
           ref: 'cropper',
           src: imagePreviewUrl,
