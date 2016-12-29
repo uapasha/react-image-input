@@ -99,11 +99,16 @@ class ImageField extends Component {
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = () => {
-        this.handleUpload({
-          imageData: reader.result,
-          imageType: this.state.imageType,
-          blob,
-        });
+        if (!this.resize) {
+          this.handleUpload({
+            imageData: reader.result,
+            imageType: this.state.imageType,
+            blob,
+          });
+        } else {
+          this.resizeAndUpload(reader.result, this.state.imageType);
+        }
+        this.setState({ isCropperOpen: false });
       };
     }, `${this.state.imageType}`);
   };
@@ -115,29 +120,14 @@ class ImageField extends Component {
         imageData,
         imageType,
       });
-    } else if (this.resize) {
-      images.resizeImage(imageData, imageType, this.maxWidth, this.maxHeight)
-        .then(({ resizedImageData }) => {
-          if (this.crop) {
-            this.setState({
-              imagePreviewUrl: resizedImageData,
-              imageType,
-              isCropperOpen: true,
-            });
-          } else {
-            this.handleUpload({
-              imageData: resizedImageData,
-              imageType,
-            });
-          }
-        })
-        .catch((err) => this.props.onError(err));
     } else if (this.crop) {
       this.setState({
         imagePreviewUrl: imageData,
         imageType,
         isCropperOpen: true,
       });
+    } else if (this.resize) {
+      this.resizeAndUpload(imageData, imageType);
     }
   };
 
@@ -157,11 +147,30 @@ class ImageField extends Component {
     }
   };
 
+  handleCancelCrop = () => {
+    const { imagePreviewUrl: imageData, imageType } = this.state;
+    if (!this.resize) {
+      this.handleUpload({ imageData, imageType });
+    } else this.resizeAndUpload(imageData, imageType);
+    this.setState({ isCropperOpen: false });
+  };
+
   clearImageData = (deleteImage) => {
     this.setState({ imagePreviewUrl: '' });
     if (deleteImage && this.props.savedImage) {
       this.props.onImageDelete();
     }
+  };
+
+  resizeAndUpload = (imageData, imageType) => {
+    images.resizeImage(imageData, imageType, this.maxWidth, this.maxHeight)
+      .then(({ resizedImageData }) => {
+        this.handleUpload({
+          imageData: resizedImageData,
+          imageType,
+        });
+      })
+      .catch((err) => this.props.onError(err));
   };
 
   render() {
@@ -184,8 +193,9 @@ class ImageField extends Component {
           imagePreviewUrl={this.state.imagePreviewUrl}
           imageType={this.state.imageType}
           open={this.state.isCropperOpen}
-          closeDialog={() => this.setState({ isCropperOpen: false })}
+          cancelDialog={this.handleCancelCrop}
           onCrop={this.onCrop}
+          alwaysCrop={options && options.alwaysCrop}
           cropAspectRatio={cropAspectRatio}
         />
       </div>

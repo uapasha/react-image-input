@@ -117,6 +117,7 @@ ImageField.propTypes = {
    *    maxWidth: 1024,
    *    },
    * }
+   * @param {bool} [alwaysCrop] - user can't cancel crop
    */
   options: PropTypes.object,
 };
