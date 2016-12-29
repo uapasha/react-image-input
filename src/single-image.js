@@ -104,6 +104,7 @@ class ImageField extends Component {
           imageType: this.state.imageType,
           blob,
         });
+        this.setState({ isCropperOpen: false });
       };
     }, `${this.state.imageType}`);
   };
@@ -157,6 +158,11 @@ class ImageField extends Component {
     }
   };
 
+  handleCancelCrop = () => {
+    this.handleUpload({ imageData: this.state.imagePreviewUrl, imageType: this.state.imageType });
+    this.setState({ isCropperOpen: false });
+  };
+
   clearImageData = (deleteImage) => {
     this.setState({ imagePreviewUrl: '' });
     if (deleteImage && this.props.savedImage) {
@@ -184,7 +190,7 @@ class ImageField extends Component {
           imagePreviewUrl={this.state.imagePreviewUrl}
           imageType={this.state.imageType}
           open={this.state.isCropperOpen}
-          closeDialog={() => this.setState({ isCropperOpen: false })}
+          cancelDialog={this.handleCancelCrop}
           onCrop={this.onCrop}
           cropAspectRatio={cropAspectRatio}
         />
