@@ -33,21 +33,30 @@ class DefaultPreview extends Component {
     this.state = {
       isHovered: false,
     };
+    this.imageInputId = `image-input-ID_${Math.random()}`;
   }
 
   render() {
     const { imageUrl, DefaultImage, fullWidth, clearImageData, allowedFileTypes,
       multipleUpload, onFileChange } = this.props;
     return (
-      <IconButton
-        containerElement="label"
-        style={imagePreviewStyles.root}
-        onMouseEnter={() => this.setState({ isHovered: true })}
-        onMouseLeave={() => this.setState({ isHovered: false })}
-      >
-        <Preview DefaultImage={DefaultImage} fullWidth={fullWidth} imageUrl={imageUrl} />
+      <div>
+        <IconButton
+          containerElement={<label htmlFor={this.imageInputId} />}
+          style={imagePreviewStyles.root}
+          onMouseEnter={() => this.setState({ isHovered: true })}
+          onMouseLeave={() => this.setState({ isHovered: false })}
+        >
+          <Preview DefaultImage={DefaultImage} fullWidth={fullWidth} imageUrl={imageUrl} />
+          <ActiveOverlay
+            isActive={this.state.isHovered}
+            imageExists={!!imageUrl}
+            clearImageData={clearImageData}
+          />
+        </IconButton>
         <input
           key="imageInput"
+          id={this.imageInputId}
           ref={(input) => { this.imageInput = input; }}
           style={imagePreviewStyles.input}
           accept={allowedFileTypes}
@@ -56,12 +65,7 @@ class DefaultPreview extends Component {
           multiple={multipleUpload}
           onChange={onFileChange}
         />
-        <ActiveOverlay
-          isActive={this.state.isHovered}
-          imageExists={!!imageUrl}
-          clearImageData={clearImageData}
-        />
-      </IconButton>
+      </div>
     );
   }
 }
