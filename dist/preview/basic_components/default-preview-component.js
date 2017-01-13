@@ -141,6 +141,7 @@
       _this.state = {
         isHovered: false
       };
+      _this.imageInputId = 'image-input-ID_' + Math.random();
       return _this;
     }
 
@@ -158,8 +159,10 @@
             multipleUpload = _props.multipleUpload,
             onFileChange = _props.onFileChange;
 
-        return _jsx(_materialUi.IconButton, {
-          containerElement: 'label',
+        return _jsx('div', {}, void 0, _jsx(_materialUi.IconButton, {
+          containerElement: _jsx('label', {
+            htmlFor: this.imageInputId
+          }),
           style: imagePreviewStyles.root,
           onMouseEnter: function onMouseEnter() {
             return _this2.setState({ isHovered: true });
@@ -171,8 +174,13 @@
           DefaultImage: DefaultImage,
           fullWidth: fullWidth,
           imageUrl: imageUrl
-        }), _react2.default.createElement('input', {
+        }), _jsx(_activeOverlay2.default, {
+          isActive: this.state.isHovered,
+          imageExists: !!imageUrl,
+          clearImageData: clearImageData
+        })), _react2.default.createElement('input', {
           key: 'imageInput',
+          id: this.imageInputId,
           ref: function ref(input) {
             _this2.imageInput = input;
           },
@@ -182,10 +190,6 @@
           type: 'file',
           multiple: multipleUpload,
           onChange: onFileChange
-        }), _jsx(_activeOverlay2.default, {
-          isActive: this.state.isHovered,
-          imageExists: !!imageUrl,
-          clearImageData: clearImageData
         }));
       }
     }]);
