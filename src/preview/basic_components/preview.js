@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import Avatar from 'material-ui/Avatar';
-import ImageIcon from 'material-ui/svg-icons/image/image';
+import ImageIcon from 'material-ui-icons/Image';
 
 const previewStyles = {
   imageIcon: {
@@ -21,7 +21,7 @@ const Preview = ({ imageUrl, DefaultImage, fullWidth }) => {
   }
   if (imageUrl) {
     return (
-      <Avatar src={imageUrl} size={120} />
+      <Avatar src={imageUrl} style={{ width: 120, height: 120 }} />
     );
   }
   return DefaultImage

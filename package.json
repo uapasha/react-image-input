@@ -1,6 +1,6 @@
 {
   "name": "react-image-input",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "get your image input field easy and ready to go",
   "main": "./dist/index.js",
   "repository": {
@@ -35,13 +35,14 @@
     "test-watch": "npm run testonly -- --watch --watch-extensions js"
   },
   "dependencies": {
-    "react-cropper": "^0.9.4"
+    "react-cropper": "^0.12.0"
   },
   "peerDependencies": {
-    "react": "^15.0.0",
-    "material-ui": "0.16.1",
-    "react-tap-event-plugin": "^1.0.0",
-    "formsy-react": "^0.18.1"
+    "formsy-react": "^0.19.2",
+    "material-ui": "next",
+    "material-ui-icons": "^1.0.0-alpha.19",
+    "react": "^15.4.4",
+    "react-tap-event-plugin": "^2.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.6.4",

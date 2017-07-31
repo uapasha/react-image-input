@@ -163,6 +163,7 @@ class ImagePreview extends Component {
           allowedFileTypes={this.allowedFileTypes}
           multipleUpload={this.multipleUpload}
           onFileChange={this.onFileChange}
+          uploadIconColor={options.uploadIconColor}
           ref={(preview) => { if (preview) this.imageInput = preview.imageInput; }}
         />
     );
