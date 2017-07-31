@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', './utils/images', './cropper-dialog', './image-preview'], factory);
+    define(['exports', 'react', './utils/images', './cropper-dialog', './preview/image-preview'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('./utils/images'), require('./cropper-dialog'), require('./image-preview'));
+    factory(exports, require('react'), require('./utils/images'), require('./cropper-dialog'), require('./preview/image-preview'));
   } else {
     var mod = {
       exports: {}
@@ -44,6 +44,49 @@
 
     return target;
   };
+
+  var _jsx = function () {
+    var REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7;
+    return function createRawReactElement(type, props, key, children) {
+      var defaultProps = type && type.defaultProps;
+      var childrenLength = arguments.length - 3;
+
+      if (!props && childrenLength !== 0) {
+        props = {};
+      }
+
+      if (props && defaultProps) {
+        for (var propName in defaultProps) {
+          if (props[propName] === void 0) {
+            props[propName] = defaultProps[propName];
+          }
+        }
+      } else if (!props) {
+        props = defaultProps || {};
+      }
+
+      if (childrenLength === 1) {
+        props.children = children;
+      } else if (childrenLength > 1) {
+        var childArray = Array(childrenLength);
+
+        for (var i = 0; i < childrenLength; i++) {
+          childArray[i] = arguments[i + 3];
+        }
+
+        props.children = childArray;
+      }
+
+      return {
+        $$typeof: REACT_ELEMENT_TYPE,
+        type: type,
+        key: key === undefined ? null : '' + key,
+        ref: null,
+        props: props,
+        _owner: null
+      };
+    };
+  }();
 
   function _objectWithoutProperties(obj, keys) {
     var target = {};
@@ -132,11 +175,16 @@
           var reader = new FileReader();
           reader.readAsDataURL(blob);
           reader.onloadend = function () {
-            _this.handleUpload({
-              imageData: reader.result,
-              imageType: _this.state.imageType,
-              blob: blob
-            });
+            if (!_this.resize) {
+              _this.handleUpload({
+                imageData: reader.result,
+                imageType: _this.state.imageType,
+                blob: blob
+              });
+            } else {
+              _this.resizeAndUpload(reader.result, _this.state.imageType);
+            }
+            _this.setState({ isCropperOpen: false });
           };
         }, '' + _this.state.imageType);
       };
@@ -150,38 +198,21 @@
             imageData: imageData,
             imageType: imageType
           });
-        } else if (_this.resize) {
-          _images2.default.resizeImage(imageData, imageType, _this.maxWidth, _this.maxHeight).then(function (_ref) {
-            var resizedImageData = _ref.resizedImageData;
-
-            if (_this.crop) {
-              _this.setState({
-                imagePreviewUrl: resizedImageData,
-                imageType: imageType,
-                isCropperOpen: true
-              });
-            } else {
-              _this.handleUpload({
-                imageData: resizedImageData,
-                imageType: imageType
-              });
-            }
-          }).catch(function (err) {
-            return _this.props.onError(err);
-          });
         } else if (_this.crop) {
           _this.setState({
             imagePreviewUrl: imageData,
             imageType: imageType,
             isCropperOpen: true
           });
+        } else if (_this.resize) {
+          _this.resizeAndUpload(imageData, imageType);
         }
       };
 
-      _this.handleUpload = function (_ref2) {
-        var imageData = _ref2.imageData,
-            imageType = _ref2.imageType,
-            blob = _ref2.blob;
+      _this.handleUpload = function (_ref) {
+        var imageData = _ref.imageData,
+            imageType = _ref.imageType,
+            blob = _ref.blob;
 
         if (_this.immediateUpload) {
           _this.props.onFileSelect([blob || _images2.default.convertToBlob(imageData, imageType)]);
@@ -198,12 +229,35 @@
         }
       };
 
+      _this.handleCancelCrop = function () {
+        var _this$state = _this.state,
+            imageData = _this$state.imagePreviewUrl,
+            imageType = _this$state.imageType;
+
+        if (!_this.resize) {
+          _this.handleUpload({ imageData: imageData, imageType: imageType });
+        } else _this.resizeAndUpload(imageData, imageType);
+        _this.setState({ isCropperOpen: false });
+      };
+
       _this.clearImageData = function (deleteImage) {
         _this.setState({ imagePreviewUrl: '' });
-        _this.props.onFileSelect('');
         if (deleteImage && _this.props.savedImage) {
           _this.props.onImageDelete();
         }
+      };
+
+      _this.resizeAndUpload = function (imageData, imageType) {
+        _images2.default.resizeImage(imageData, imageType, _this.maxWidth, _this.maxHeight).then(function (_ref2) {
+          var resizedImageData = _ref2.resizedImageData;
+
+          _this.handleUpload({
+            imageData: resizedImageData,
+            imageType: imageType
+          });
+        }).catch(function (err) {
+          return _this.props.onError(err);
+        });
       };
 
       _this.state = {
@@ -212,7 +266,11 @@
         imageType: ''
       };
       if (props.options) {
-        _this.resize = props.options.resize !== false;
+        if (props.isCordova) {
+          _this.resize = false;
+        } else {
+          _this.resize = props.options.resize !== false;
+        }
         _this.crop = props.options.crop !== false;
         _this.immediateUpload = props.options.immediateUpload;
         _this.maxWidth = props.options.maxWidth || 400;
@@ -227,8 +285,6 @@
     _createClass(ImageField, [{
       key: 'render',
       value: function render() {
-        var _this2 = this;
-
         var _props = this.props,
             savedImage = _props.savedImage,
             options = _props.options,
@@ -237,75 +293,29 @@
         var cropAspectRatio = options && options.cropAspectRatio;
         var imagePreviewUrl = this.state.imagePreviewUrl;
 
-        return _react2.default.createElement(
-          'div',
-          null,
-          _react2.default.createElement(_imagePreview2.default, _extends({
-            imageUrl: imagePreviewUrl || savedImage,
-            setImageUrl: this.handleNewUrl,
-            clearImageData: this.clearImageData,
-            options: options
-          }, props)),
-          _react2.default.createElement(_cropperDialog2.default, {
-            imagePreviewUrl: this.state.imagePreviewUrl,
-            imageType: this.state.imageType,
-            open: this.state.isCropperOpen,
-            closeDialog: function closeDialog() {
-              return _this2.setState({ isCropperOpen: false });
-            },
-            onCrop: this.onCrop,
-            cropAspectRatio: cropAspectRatio
-          })
-        );
+        return _jsx('div', {}, void 0, _react2.default.createElement(_imagePreview2.default, _extends({
+          imageUrl: imagePreviewUrl || savedImage,
+          setImageUrl: this.handleNewUrl,
+          clearImageData: this.clearImageData,
+          options: options
+        }, props, {
+          maxWidth: this.maxWidth,
+          maxHeight: this.maxHeight,
+          resize: options && options.resize !== false
+        })), _jsx(_cropperDialog2.default, {
+          imagePreviewUrl: this.state.imagePreviewUrl,
+          imageType: this.state.imageType,
+          open: this.state.isCropperOpen,
+          cancelDialog: this.handleCancelCrop,
+          onCrop: this.onCrop,
+          alwaysCrop: options && options.alwaysCrop,
+          cropAspectRatio: cropAspectRatio
+        }));
       }
     }]);
 
     return ImageField;
   }(_react.Component);
 
-  ImageField.propTypes = {
-    /**
-     *  @param {string} [savedImage] - url to image that is already saved
-     */
-    savedImage: _react.PropTypes.string,
-    /**
-     * @param {function} [defaultImage] - React component that renders
-     * placeholder if savedImage is not provided
-     */
-    defaultImage: _react.PropTypes.oneOfType([_react.PropTypes.func, _react.PropTypes.object]),
-    /**
-     * @param {function} onFileSelect - will be called when image selection
-     * process is completed. Returns an array of Blobs
-     */
-    onFileSelect: _react.PropTypes.func.isRequired,
-    /**
-     *  @param {function} [onError] - callback called when user select wrong fileType
-     */
-    onError: _react.PropTypes.func,
-    /**
-     * @param {bool} [isUploading] - state of uploading of the image
-     * be called when left button is pressed
-     */
-    isUploading: _react.PropTypes.bool,
-    /**
-     *  @param {function} onImageDelete - callback called when deleteImage button pressed
-     */
-    onImageDelete: _react.PropTypes.func,
-    /**
-     * @param {object} [options] - options for the component
-     * @param {array} [options.allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif']] -
-     * allowed file types in form of 'image/jpeg'
-     * @param {bool} [options.fullWidth = false] - format of the image to be displayed
-     * @param {bool} [options.resize = true] - resize image before upload
-     * @param {number} [options.maxHeight = 300] - max value for height of resized image in px
-     * @param {number} [options.maxWidth = 400] - max value for width of resized image in px
-     * @crop {bool} [options.crop = true] - crop image before upload
-     * @param {number} [options.cropAspectRatio = 1] - cropAspectRatio
-     * @param {bool} [options.immediateUpload = false] - upload image immediately
-     * @param {bool} [multipleUpload = false] - able to select and upload multiple images at once
-     * is supported only if no crop applied
-     */
-    options: _react.PropTypes.object
-  };
   exports.default = ImageField;
 });

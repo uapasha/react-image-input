@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import images from './utils/images';
-import ImagePreview from './image-preview';
+import ImagePreview from './preview/image-preview';
 
 class MultipleImages extends Component {
   static propTypes = {

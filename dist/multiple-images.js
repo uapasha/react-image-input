@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', './utils/images', './image-preview'], factory);
+    define(['exports', 'react', './utils/images', './preview/image-preview'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('./utils/images'), require('./image-preview'));
+    factory(exports, require('react'), require('./utils/images'), require('./preview/image-preview'));
   } else {
     var mod = {
       exports: {}
@@ -249,41 +249,5 @@
     return MultipleImages;
   }(_react.Component);
 
-  MultipleImages.propTypes = {
-    /**
-     * @param {function} onFileSelect - will be called when image selection
-     * process is completed. Returns an array of Blobs
-     */
-    onFileSelect: _react.PropTypes.func.isRequired,
-    /**
-     *  @param {function} [onError] - callback called when user select wrong fileType
-     */
-    onError: _react.PropTypes.func,
-    /**
-     * @param {object} [options] - options for the component
-     * @param {array} [options.allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif']] -
-     * allowed file types in form of 'image/jpeg'
-     * @param {bool} [options.fullWidth = false] - format of the image to be displayed
-     * @param {bool} [options.resize = true] - resize image before upload
-     * @param {number} [options.maxHeight = 300] - max value for height of resized image in px
-     * @param {number} [options.maxWidth = 400] - max value for width of resized image in px
-     * @param {bool} [multipleUpload = false] - able to select and upload multiple images at once
-     * is supported only if no crop applied
-     * @ param {object} [sizes] - sizes for saving images in multiple sizes for example:
-       * {
-       *   small: {
-       *     maxWidth: 400,
-       *     maxHeight: 300,
-       *   },
-       *   medium: {
-       *     maxWidth: 700,
-       *   },
-       *   large: {
-       *    maxWidth: 1024,
-       *    },
-       * }
-     */
-    options: _react.PropTypes.object
-  };
   exports.default = MultipleImages;
 });

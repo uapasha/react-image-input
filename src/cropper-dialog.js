@@ -6,26 +6,29 @@ import '/node_modules/cropperjs/dist/cropper.css';
 import messages from './utils/messages';
 
 
-// TODO uapasha handle style
-const cropStyle = {
-  height: 300,
-  width: '100%',
-};
-
-const styles = {
-  cropper: cropStyle,
+const cropStyles = {
+  cropper: {
+    height: 300,
+    width: '100%',
+  },
 };
 
 class CropperDialog extends React.Component {
   static propTypes = {
     imagePreviewUrl: PropTypes.string,
-    closeDialog: PropTypes.func,
+    cancelDialog: PropTypes.func,
     onCrop: PropTypes.func,
     open: PropTypes.bool,
     cropAspectRatio: PropTypes.number,
+    alwaysCrop: PropTypes.bool,
   };
 
   getActions = () => ([
+    !this.props.alwaysCrop ? <FlatButton
+      label={messages['dont_crop']}
+      primary
+      onTouchTap={this.handleClose}
+    /> : null,
     <FlatButton
       label={messages['crop']}
       primary
@@ -35,9 +38,12 @@ class CropperDialog extends React.Component {
   ]);
 
   handleCrop = () => {
-    const { onCrop, closeDialog } = this.props;
+    const { onCrop } = this.props;
     onCrop(this.refs.cropper.getCroppedCanvas());
-    closeDialog();
+  };
+
+  handleClose = () => {
+    this.props.cancelDialog();
   };
 
   render() {
@@ -48,12 +54,13 @@ class CropperDialog extends React.Component {
         actions={this.getActions()}
         modal
         open={open}
+        onRequestClose={this.handleClose}
       >
         {open
           ? <Cropper
             ref="cropper"
             src={imagePreviewUrl}
-            style={styles.cropper}
+            style={cropStyles.cropper}
             viewMode={2}
             aspectRatio={cropAspectRatio || 1}
             guides={false}

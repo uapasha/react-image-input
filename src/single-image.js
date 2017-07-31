@@ -6,7 +6,7 @@
 import React, { PropTypes, Component } from 'react';
 import images from './utils/images';
 import CropperDialog from './cropper-dialog';
-import ImagePreview from './image-preview';
+import ImagePreview from './preview/image-preview';
 
 class ImageField extends Component {
   static propTypes = {
@@ -54,6 +54,7 @@ class ImageField extends Component {
      * is supported only if no crop applied
      */
     options: PropTypes.object,
+    isCordova: PropTypes.bool,
   };
 
   constructor(props) {
@@ -64,7 +65,11 @@ class ImageField extends Component {
       imageType: '',
     };
     if (props.options) {
-      this.resize = props.options.resize !== false;
+      if (props.isCordova) {
+        this.resize = false;
+      } else {
+        this.resize = props.options.resize !== false;
+      }
       this.crop = props.options.crop !== false;
       this.immediateUpload = props.options.immediateUpload;
       this.maxWidth = props.options.maxWidth || 400;
@@ -94,11 +99,16 @@ class ImageField extends Component {
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = () => {
-        this.handleUpload({
-          imageData: reader.result,
-          imageType: this.state.imageType,
-          blob,
-        });
+        if (!this.resize) {
+          this.handleUpload({
+            imageData: reader.result,
+            imageType: this.state.imageType,
+            blob,
+          });
+        } else {
+          this.resizeAndUpload(reader.result, this.state.imageType);
+        }
+        this.setState({ isCropperOpen: false });
       };
     }, `${this.state.imageType}`);
   };
@@ -110,29 +120,14 @@ class ImageField extends Component {
         imageData,
         imageType,
       });
-    } else if (this.resize) {
-      images.resizeImage(imageData, imageType, this.maxWidth, this.maxHeight)
-        .then(({ resizedImageData }) => {
-          if (this.crop) {
-            this.setState({
-              imagePreviewUrl: resizedImageData,
-              imageType,
-              isCropperOpen: true,
-            });
-          } else {
-            this.handleUpload({
-              imageData: resizedImageData,
-              imageType,
-            });
-          }
-        })
-        .catch((err) => this.props.onError(err));
     } else if (this.crop) {
       this.setState({
         imagePreviewUrl: imageData,
         imageType,
         isCropperOpen: true,
       });
+    } else if (this.resize) {
+      this.resizeAndUpload(imageData, imageType);
     }
   };
 
@@ -152,12 +147,30 @@ class ImageField extends Component {
     }
   };
 
+  handleCancelCrop = () => {
+    const { imagePreviewUrl: imageData, imageType } = this.state;
+    if (!this.resize) {
+      this.handleUpload({ imageData, imageType });
+    } else this.resizeAndUpload(imageData, imageType);
+    this.setState({ isCropperOpen: false });
+  };
+
   clearImageData = (deleteImage) => {
     this.setState({ imagePreviewUrl: '' });
-    this.props.onFileSelect('');
     if (deleteImage && this.props.savedImage) {
       this.props.onImageDelete();
     }
+  };
+
+  resizeAndUpload = (imageData, imageType) => {
+    images.resizeImage(imageData, imageType, this.maxWidth, this.maxHeight)
+      .then(({ resizedImageData }) => {
+        this.handleUpload({
+          imageData: resizedImageData,
+          imageType,
+        });
+      })
+      .catch((err) => this.props.onError(err));
   };
 
   render() {
@@ -172,13 +185,17 @@ class ImageField extends Component {
           clearImageData={this.clearImageData}
           options={options}
           {...props}
+          maxWidth={this.maxWidth}
+          maxHeight={this.maxHeight}
+          resize={options && options.resize !== false}
         />
         <CropperDialog
           imagePreviewUrl={this.state.imagePreviewUrl}
           imageType={this.state.imageType}
           open={this.state.isCropperOpen}
-          closeDialog={() => this.setState({ isCropperOpen: false })}
+          cancelDialog={this.handleCancelCrop}
           onCrop={this.onCrop}
+          alwaysCrop={options && options.alwaysCrop}
           cropAspectRatio={cropAspectRatio}
         />
       </div>

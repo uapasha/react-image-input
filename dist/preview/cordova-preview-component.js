@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'material-ui/Dialog', 'material-ui/FlatButton', 'react-cropper', './utils/messages', '/node_modules/cropperjs/dist/cropper.css'], factory);
+    define(['exports', 'react', 'material-ui', '../basic_components/preview', '../basic_components/active-overlay'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('material-ui/Dialog'), require('material-ui/FlatButton'), require('react-cropper'), require('./utils/messages'), require('/node_modules/cropperjs/dist/cropper.css'));
+    factory(exports, require('react'), require('material-ui'), require('../basic_components/preview'), require('../basic_components/active-overlay'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.Dialog, global.FlatButton, global.reactCropper, global.messages, global.cropper);
-    global.cropperDialog = mod.exports;
+    factory(mod.exports, global.react, global.materialUi, global.preview, global.activeOverlay);
+    global.cordovaPreviewComponent = mod.exports;
   }
-})(this, function (exports, _react, _Dialog, _FlatButton, _reactCropper, _messages) {
+})(this, function (exports, _react, _materialUi, _preview, _activeOverlay) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -19,13 +19,9 @@
 
   var _react2 = _interopRequireDefault(_react);
 
-  var _Dialog2 = _interopRequireDefault(_Dialog);
+  var _preview2 = _interopRequireDefault(_preview);
 
-  var _FlatButton2 = _interopRequireDefault(_FlatButton);
-
-  var _reactCropper2 = _interopRequireDefault(_reactCropper);
-
-  var _messages2 = _interopRequireDefault(_messages);
+  var _activeOverlay2 = _interopRequireDefault(_activeOverlay);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -124,76 +120,69 @@
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
 
-  var cropStyles = {
-    cropper: {
-      height: 300,
-      width: '100%'
+  var imagePreviewStyles = {
+    root: {
+      width: 'initial',
+      height: '100%'
+    },
+    input: {
+      display: 'none'
     }
   };
 
-  var CropperDialog = function (_React$Component) {
-    _inherits(CropperDialog, _React$Component);
+  var CordovaPreview = function (_Component) {
+    _inherits(CordovaPreview, _Component);
 
-    function CropperDialog() {
-      var _ref;
+    function CordovaPreview(props) {
+      _classCallCheck(this, CordovaPreview);
 
-      var _temp, _this, _ret;
+      var _this = _possibleConstructorReturn(this, (CordovaPreview.__proto__ || Object.getPrototypeOf(CordovaPreview)).call(this, props));
 
-      _classCallCheck(this, CropperDialog);
+      _this.handleTouch = function () {
+        if (!_this.state.isActive) {
+          _this.setState({
+            isActive: true
+          });
+        } else {
+          _this.setState({
+            isActive: false
+          });
+          _this.props.onImageSelect();
+        }
+      };
 
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = CropperDialog.__proto__ || Object.getPrototypeOf(CropperDialog)).call.apply(_ref, [this].concat(args))), _this), _this.getActions = function () {
-        return [!_this.props.alwaysCrop ? _jsx(_FlatButton2.default, {
-          label: _messages2.default['dont_crop'],
-          primary: true,
-          onTouchTap: _this.handleClose
-        }) : null, _jsx(_FlatButton2.default, {
-          label: _messages2.default['crop'],
-          primary: true,
-          keyboardFocused: true,
-          onTouchTap: _this.handleCrop
-        })];
-      }, _this.handleCrop = function () {
-        var onCrop = _this.props.onCrop;
-
-        onCrop(_this.refs.cropper.getCroppedCanvas());
-      }, _this.handleClose = function () {
-        _this.props.cancelDialog();
-      }, _temp), _possibleConstructorReturn(_this, _ret);
+      _this.state = {
+        isActive: false
+      };
+      return _this;
     }
 
-    _createClass(CropperDialog, [{
+    _createClass(CordovaPreview, [{
       key: 'render',
       value: function render() {
         var _props = this.props,
-            open = _props.open,
-            imagePreviewUrl = _props.imagePreviewUrl,
-            cropAspectRatio = _props.cropAspectRatio;
+            DefaultImage = _props.DefaultImage,
+            fullWidth = _props.fullWidth,
+            imageUrl = _props.imageUrl,
+            clearImageData = _props.clearImageData;
 
-        return _jsx(_Dialog2.default, {
-          title: _messages2.default['crop_image'],
-          actions: this.getActions(),
-          modal: true,
-          open: open,
-          onRequestClose: this.handleClose
-        }, void 0, open ? _react2.default.createElement(_reactCropper2.default, {
-          ref: 'cropper',
-          src: imagePreviewUrl,
-          style: cropStyles.cropper,
-          viewMode: 2,
-          aspectRatio: cropAspectRatio || 1,
-          guides: false,
-          modal: false,
-          background: false
-        }) : '');
+        return _jsx('div', {}, void 0, _jsx(_materialUi.IconButton, {
+          style: imagePreviewStyles.root,
+          onTouchTap: this.handleTouch
+        }, void 0, _jsx(_preview2.default, {
+          DefaultImage: DefaultImage,
+          fullWidth: fullWidth,
+          imageUrl: imageUrl
+        })), _jsx(_activeOverlay2.default, {
+          isActive: this.state.isActive,
+          imageExists: !!imageUrl,
+          clearImageData: clearImageData
+        }));
       }
     }]);
 
-    return CropperDialog;
-  }(_react2.default.Component);
+    return CordovaPreview;
+  }(_react.Component);
 
-  exports.default = CropperDialog;
+  exports.default = CordovaPreview;
 });
