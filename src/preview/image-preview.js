@@ -10,7 +10,7 @@ const defaultFileTypes = ['image/jpeg', 'image/png', 'image/gif'];
 class ImagePreview extends Component {
   static propTypes ={
     imageUrl: PropTypes.string,
-    DefaultImage: PropTypes.oneOfType([
+    defaultImage: PropTypes.oneOfType([
       PropTypes.func, PropTypes.object,
     ]),
     onImageSizeGet: PropTypes.func,
@@ -144,12 +144,12 @@ class ImagePreview extends Component {
   };
 
   render() {
-    const { isCordova, imageUrl, DefaultImage, options, clearImageData } = this.props;
+    const { isCordova, imageUrl, defaultImage, options, clearImageData } = this.props;
     const fullWidth = options && options.fullWidth;
     return (
       isCordova
         ? <CordovaPreview
-          DefaultImage={DefaultImage}
+          DefaultImage={defaultImage}
           fullWidth={fullWidth}
           clearImageData={clearImageData}
           imageUrl={imageUrl}
@@ -157,12 +157,13 @@ class ImagePreview extends Component {
         />
         : <DefaultPreview
           imageUrl={imageUrl}
-          DefaultImage={DefaultImage}
+          DefaultImage={defaultImage}
           fullWidth={fullWidth}
           clearImageData={clearImageData}
           allowedFileTypes={this.allowedFileTypes}
           multipleUpload={this.multipleUpload}
           onFileChange={this.onFileChange}
+          uploadIconColor={options.uploadIconColor}
           ref={(preview) => { if (preview) this.imageInput = preview.imageInput; }}
         />
     );

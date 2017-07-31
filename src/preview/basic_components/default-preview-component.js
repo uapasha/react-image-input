@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { IconButton } from 'material-ui';
+import IconButton from 'material-ui/IconButton';
 
 import Preview from './preview';
 import ActiveOverlay from './active-overlay';
@@ -26,6 +26,7 @@ class DefaultPreview extends Component {
     allowedFileTypes: PropTypes.array,
     multipleUpload: PropTypes.bool,
     onFileChange: PropTypes.func,
+    uploadIconColor: PropTypes.string,
   };
 
   constructor(props) {
@@ -38,20 +39,28 @@ class DefaultPreview extends Component {
 
   render() {
     const { imageUrl, DefaultImage, fullWidth, clearImageData, allowedFileTypes,
-      multipleUpload, onFileChange } = this.props;
+      multipleUpload, onFileChange, uploadIconColor } = this.props;
     return (
       <div>
         <IconButton
-          containerElement={<label htmlFor={this.imageInputId} />}
+          component={
+            ({ children }) =>
+              <label
+                htmlFor={this.imageInputId}
+                onMouseEnter={() => this.setState({ isHovered: true })}
+                onMouseLeave={() => this.setState({ isHovered: false })}
+              >
+                {children}
+              </label>
+          }
           style={imagePreviewStyles.root}
-          onMouseEnter={() => this.setState({ isHovered: true })}
-          onMouseLeave={() => this.setState({ isHovered: false })}
         >
           <Preview DefaultImage={DefaultImage} fullWidth={fullWidth} imageUrl={imageUrl} />
           <ActiveOverlay
             isActive={this.state.isHovered}
             imageExists={!!imageUrl}
             clearImageData={clearImageData}
+            uploadIconColor={uploadIconColor}
           />
         </IconButton>
         <input

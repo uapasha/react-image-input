@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import Button from 'material-ui/Button';
 import Cropper from 'react-cropper';
-import '/node_modules/cropperjs/dist/cropper.css';
+import 'cropperjs/dist/cropper.css';
 import messages from './utils/messages';
 
 
@@ -24,12 +24,12 @@ class CropperDialog extends React.Component {
   };
 
   getActions = () => ([
-    !this.props.alwaysCrop ? <FlatButton
+    !this.props.alwaysCrop ? <Button
       label={messages['dont_crop']}
       primary
       onTouchTap={this.handleClose}
     /> : null,
-    <FlatButton
+    <Button
       label={messages['crop']}
       primary
       keyboardFocused

@@ -6,7 +6,7 @@ import { HOC } from 'formsy-react';
 import ImageField from './image-field';
 
 const FormsyImageField = ({ setValue, ...props }) => (
-  <ImageField onFileSelect={setValue} {...props} />
+  <ImageField onFileSelect={setValue} onImageDelete={() => setValue([])} {...props} />
 );
 
 FormsyImageField.propTypes = {

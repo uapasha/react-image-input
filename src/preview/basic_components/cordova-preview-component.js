@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react';
-import { IconButton } from 'material-ui';
+import IconButton from 'material-ui/IconButton';
 
 import Preview from './preview';
 import ActiveOverlay from './active-overlay';

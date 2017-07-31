@@ -4,7 +4,7 @@
  */
 
 import React, { PropTypes } from 'react';
-import CircularProgress from 'material-ui/CircularProgress';
+import { CircularProgress } from 'material-ui/Progress';
 import SingleImage from './single-image';
 import MultipleImages from './multiple-images';
 

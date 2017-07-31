@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
-import { IconButton } from 'material-ui';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import FileUpload from 'material-ui/svg-icons/file/file-upload';
+import IconButton from 'material-ui/IconButton';
+import DeleteIcon from 'material-ui-icons/Delete';
+import FileUpload from 'material-ui-icons/FileUpload';
 
 import messages from '../../utils/messages';
 
@@ -30,11 +30,17 @@ const onHoverStyles = {
   },
 };
 
-const ActiveOverlay = ({ isActive, clearImageData, imageExists, onUploadTouch }) => (
+const ActiveOverlay = ({
+  isActive,
+  clearImageData,
+  imageExists,
+  onUploadTouch,
+  uploadIconColor,
+}) => (
   isActive
     ? <div style={onHoverStyles.root}>
       <FileUpload
-        style={onHoverStyles.uploadIcon}
+        style={{ ...onHoverStyles.uploadIcon, color: uploadIconColor }}
         onTouchTap={onUploadTouch || function () {}}
       />
       {imageExists ?
@@ -55,6 +61,7 @@ ActiveOverlay.propTypes = {
   clearImageData: PropTypes.func,
   imageExists: PropTypes.bool,
   onUploadTouch: PropTypes.func,
+  uploadIconColor: PropTypes.string,
 };
 
 export default ActiveOverlay;
